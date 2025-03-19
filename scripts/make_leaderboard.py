@@ -47,7 +47,7 @@ def load_leaderboard(
         raise ValueError(
             f"Benchmark '{benchmark_name}' not found. Available: {get_available_benchmarks()}"
         )
-
+    import pdb; pdb.set_trace()
     # Load all results from the specified repository
     benchmark_results = load_results(
         results_repo=results_repo,
@@ -103,50 +103,59 @@ def load_leaderboard(
     return summary_df, per_task_df
 
 
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser(
+#         description="Generate and save an MTEB leaderboard for a specified benchmark."
+#     )
+
+#     parser.add_argument(
+#         "--benchmark",
+#         type=str,
+#         required=True,
+#         help=f"Which benchmark to load. Available: {get_available_benchmarks()}",
+#     )
+
+#     parser.add_argument(
+#         "--models",
+#         type=str,
+#         nargs="*",
+#         default=None,
+#         help="List of model names to include (default: all models).",
+#     )
+
+#     parser.add_argument(
+#         "--results_repo",
+#         type=str,
+#         default="https://github.com/embeddings-benchmark/results",
+#         help="Path to results repository. Default is the official MTEB results repo.",
+#     )
+
+#     parser.add_argument(
+#         "--save-path",
+#         type=str,
+#         default=None,
+#         help="Path to save the leaderboard as a CSV file",
+#     )
+
+#     args = parser.parse_args()
+#     summary_df, per_task_df = load_leaderboard(
+#         benchmark_name=args.benchmark,
+#         models=args.models,
+#         results_repo=args.results_repo,
+#         save_path=args.save_path,
+#     )
+
+#     print("\n===== SUMMARY TABLE =====")
+#     print(summary_df)
+
+#     print("\n===== PER-TASK TABLE =====")
+#     print(per_task_df)
+
+
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="Generate and save an MTEB leaderboard for a specified benchmark."
-    )
-
-    parser.add_argument(
-        "--benchmark",
-        type=str,
-        required=True,
-        help=f"Which benchmark to load. Available: {get_available_benchmarks()}",
-    )
-
-    parser.add_argument(
-        "--models",
-        type=str,
-        nargs="*",
-        default=None,
-        help="List of model names to include (default: all models).",
-    )
-
-    parser.add_argument(
-        "--results_repo",
-        type=str,
-        default="https://github.com/embeddings-benchmark/results",
-        help="Path to results repository. Default is the official MTEB results repo.",
-    )
-
-    parser.add_argument(
-        "--save-path",
-        type=str,
-        default=None,
-        help="Path to save the leaderboard as a CSV file",
-    )
-
-    args = parser.parse_args()
     summary_df, per_task_df = load_leaderboard(
-        benchmark_name=args.benchmark,
-        models=args.models,
-        results_repo=args.results_repo,
-        save_path=args.save_path,
+        benchmark_name="MTEB(eng, v2)",
+        models=None,
+        results_repo="/Users/aamita/Oracle/oracle/devops/multimodal_retrieval/image/mteb-results",
+        save_path="debug",
     )
-
-    print("\n===== SUMMARY TABLE =====")
-    print(summary_df)
-
-    print("\n===== PER-TASK TABLE =====")
-    print(per_task_df)
