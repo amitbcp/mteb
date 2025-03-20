@@ -17,10 +17,11 @@ from gradio_rangeslider import RangeSlider
 
 import mteb
 from mteb.abstasks.TaskMetadata import TASK_DOMAIN, TASK_TYPE
-from mteb.benchmarks.benchmarks import MTEB_multilingual
+from mteb.benchmarks.benchmarks import MIEB_ENG
 from mteb.custom_validators import MODALITIES
 from mteb.languages import ISO_TO_LANGUAGE
 from mteb.leaderboard.figures import performance_size_plot, radar_chart
+from mteb.leaderboard.oci import ALL_MODELS
 from mteb.leaderboard.table import scores_to_tables
 
 logging.getLogger("mteb.load_results.task_results").setLevel(
@@ -32,37 +33,42 @@ logging.getLogger("mteb.models.overview").setLevel(
 warnings.filterwarnings("ignore", message="Couldn't get scores for .* due to .*")
 logger = logging.getLogger(__name__)
 
-acknowledgment_md = """
-### Acknowledgment
-We thank [Google](https://cloud.google.com/), [ServiceNow](https://www.servicenow.com/), [Contextual AI](https://contextual.ai/) and [Hugging Face](https://huggingface.co/) for their generous sponsorship. If you'd like to sponsor us, please get in [touch](mailto:n.muennighoff@gmail.com).
+acknowledgment_md = """### Acknowledgement"""
+# acknowledgment_md = """
+# ### Acknowledgment
+# We thank [Google](https://cloud.google.com/), [ServiceNow](https://www.servicenow.com/), [Contextual AI](https://contextual.ai/) and [Hugging Face](https://huggingface.co/) for their generous sponsorship. If you'd like to sponsor us, please get in [touch](mailto:n.muennighoff@gmail.com).
 
-<div class="sponsor-image-about" style="display: flex; align-items: center; gap: 10px;">
-    <a href="https://cloud.google.com/">
-        <img src="https://img.icons8.com/?size=512&id=17949&format=png" width="60" height="55" style="padding: 10px;">
-    </a>
-    <a href="https://www.servicenow.com/">
-        <img src="https://play-lh.googleusercontent.com/HdfHZ5jnfMM1Ep7XpPaVdFIVSRx82wKlRC_qmnHx9H1E4aWNp4WKoOcH0x95NAnuYg" width="60" height="55" style="padding: 10px;">
-    </a>
-    <a href="https://contextual.ai/">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd4EDMoZLFRrIjVBrSXOQYGcmvUJ3kL4U2usvjuKPla-LoRTZtLzFnb_Cu5tXzRI7DNBo&usqp=CAU" width="60" height="55" style="padding: 10px;">
-    </a>
-    <a href="https://huggingface.co">
-        <img src="https://raw.githubusercontent.com/embeddings-benchmark/mteb/main/docs/images/hf_logo.png" width="60" height="55" style="padding: 10px;">
-    </a>
-</div>
+# <div class="sponsor-image-about" style="display: flex; align-items: center; gap: 10px;">
+#     <a href="https://cloud.google.com/">
+#         <img src="https://img.icons8.com/?size=512&id=17949&format=png" width="60" height="55" style="padding: 10px;">
+#     </a>
+#     <a href="https://www.servicenow.com/">
+#         <img src="https://play-lh.googleusercontent.com/HdfHZ5jnfMM1Ep7XpPaVdFIVSRx82wKlRC_qmnHx9H1E4aWNp4WKoOcH0x95NAnuYg" width="60" height="55" style="padding: 10px;">
+#     </a>
+#     <a href="https://contextual.ai/">
+#         <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQd4EDMoZLFRrIjVBrSXOQYGcmvUJ3kL4U2usvjuKPla-LoRTZtLzFnb_Cu5tXzRI7DNBo&usqp=CAU" width="60" height="55" style="padding: 10px;">
+#     </a>
+#     <a href="https://huggingface.co">
+#         <img src="https://raw.githubusercontent.com/embeddings-benchmark/mteb/main/docs/images/hf_logo.png" width="60" height="55" style="padding: 10px;">
+#     </a>
+# </div>
 
-We also thank the following companies which provide API credits to evaluate their models: [OpenAI](https://openai.com/), [Voyage AI](https://www.voyageai.com/)
-"""
+# We also thank the following companies which provide API credits to evaluate their models: [OpenAI](https://openai.com/), [Voyage AI](https://www.voyageai.com/)
+# """
 
 
-ALL_MODELS = {meta.name for meta in mteb.get_model_metas()}
+# ALL_MODELS = {meta.name for meta in mteb.get_model_metas()}
+
+# IMAGE_TASKS = ["ImageCoDeT2IMultiChoice","AROCocoOrder","AROFlickrOrder","AROVisualAttribution","AROVisualRelation","SugarCrepe","Winoground","BLINKIT2IMultiChoice"]
 
 
 def load_results():
     results_cache_path = Path(__file__).parent.joinpath("__cached_results.json")
     if not results_cache_path.exists():
         all_results = mteb.load_results(
-            only_main_score=True, require_model_meta=False, models=ALL_MODELS
+            only_main_score=True,
+            require_model_meta=False,
+            models=ALL_MODELS,  # , tasks=IMAGE_TASKS
         ).filter_models()
         all_results.to_disk(results_cache_path)
         return all_results
@@ -84,7 +90,7 @@ def produce_benchmark_link(benchmark_name: str, request: gr.Request) -> str:
     return md
 
 
-DEFAULT_BENCHMARK_NAME = MTEB_multilingual.name
+DEFAULT_BENCHMARK_NAME = MIEB_ENG.name  # MTEB_multilingual.name
 
 
 def set_benchmark_on_load(request: gr.Request):
@@ -252,9 +258,30 @@ lang_select = gr.Dropdown(
     label="Language",
     info="Select languages to include.",
 )
+default_types = ["Any2AnyRetrieval", "VisionCentric", "DocumentUnderstanding"]
+
+
+# def default_task_list(benchmark_name, lang_select, modality_select):
+#     # start_time = time.time()
+#     domain_select = sorted(default_results.domains)
+#     default_tasks = []
+#     for task in mteb.get_benchmark(benchmark_name).tasks:
+#         if task.metadata.type not in default_types:
+#             continue
+#         if not (set(task.metadata.domains or []) & set(domain_select)):
+#             continue
+#         if not (set(task.languages or []) & set(lang_select)):
+#             continue
+#         if not (set(task.metadata.modalities or []) & set(modality_select)):
+#             continue
+#         default_tasks.append(task.metadata.name)
+#     # elapsed = time.time() - start_time
+#     return default_tasks
+
+
 type_select = gr.Dropdown(
     sorted(get_args(TASK_TYPE)),
-    value=sorted(default_results.task_types),
+    value=default_types,  # sorted(default_results.task_types),
     multiselect=True,
     label="Task Type",
     info="Select task types to include.",
@@ -835,7 +862,7 @@ see existing implementations [here](https://github.com/embeddings-benchmark/mteb
         outputs=[summary_table, per_task_table],
     )
 
-    gr.Markdown(acknowledgment_md, elem_id="ack_markdown")
+    # gr.Markdown(acknowledgment_md, elem_id="ack_markdown")
 
 
 # Prerun on all benchmarks, so that results of callbacks get cached
@@ -866,5 +893,34 @@ for benchmark in benchmarks:
     update_tables(bench_scores, "", filtered_tasks, filtered_models, benchmark.name)
 
 
+def update_task_list_and_refresh(*args):
+    task_list = update_task_list(*args)
+    return task_list, update_tables(
+        scores.value, searchbar.value, task_list, models.value, benchmark_select.value
+    )
+
+
+def on_app_load():
+    default_task_types = ["Any2AnyRetrieval", "VisionCentric", "DocumentUnderstanding"]
+
+    # Call update_task_list_and_refresh to get filtered tasks and updated summary
+    task_list, summary, per_task = update_task_list_and_refresh(
+        DEFAULT_BENCHMARK_NAME,
+        default_task_types,
+        sorted(default_results.domains),
+        sorted(default_results.languages),
+        sorted(default_results.modalities),
+    )
+
+    return default_task_types, task_list, summary, per_task
+
+
 if __name__ == "__main__":
+    # At the bottom of your code, after defining everything:
+
+    demo.load(
+        on_app_load,
+        inputs=[],
+        outputs=[type_select, task_select, summary_table, per_task_table],
+    )
     demo.launch(share=True)
