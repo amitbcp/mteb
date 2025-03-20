@@ -1414,59 +1414,59 @@ BEIR_NL = Benchmark(
 
 MIEB_common_tasks = [
     # Image Classification
-    "Birdsnap",  # fine
-    "Caltech101",  # fine
-    "CIFAR10",  # coarse
-    "CIFAR100",  # fine
-    "Country211",  # fine
-    "DTD",  # coarse
-    "EuroSAT",  # coarse
-    "FER2013",  # coarse
-    "FGVCAircraft",  # fine
-    "Food101Classification",  # fine
-    "GTSRB",  # coarse
-    "Imagenet1k",  # fine
-    "MNIST",  # coarse
-    "OxfordFlowersClassification",  # fine
-    "OxfordPets",  # fine
-    "PatchCamelyon",  # coarse
-    "RESISC45",  # fine
-    "StanfordCars",  # fine
-    "STL10",  # coarse
-    "SUN397",  # fine
-    "UCF101",  # fine
+    # "Birdsnap",  # fine
+    # "Caltech101",  # fine
+    # "CIFAR10",  # coarse
+    # "CIFAR100",  # fine
+    # "Country211",  # fine
+    # "DTD",  # coarse
+    # "EuroSAT",  # coarse
+    # "FER2013",  # coarse
+    # "FGVCAircraft",  # fine
+    # "Food101Classification",  # fine
+    # "GTSRB",  # coarse
+    # "Imagenet1k",  # fine
+    # "MNIST",  # coarse
+    # "OxfordFlowersClassification",  # fine
+    # "OxfordPets",  # fine
+    # "PatchCamelyon",  # coarse
+    # "RESISC45",  # fine
+    # "StanfordCars",  # fine
+    # "STL10",  # coarse
+    # "SUN397",  # fine
+    # "UCF101",  # fine
     # ImageMultiLabelClassification
-    "VOC2007",  # coarse
+    # "VOC2007",  # coarse
     # Clustering
-    "CIFAR10Clustering",
-    "CIFAR100Clustering",
-    "ImageNetDog15Clustering",
-    "ImageNet10Clustering",
-    "TinyImageNetClustering",
+    # "CIFAR10Clustering",
+    # "CIFAR100Clustering",
+    # "ImageNetDog15Clustering",
+    # "ImageNet10Clustering",
+    # "TinyImageNetClustering",
     # ZeroShotClassification
-    "BirdsnapZeroShot",
-    "Caltech101ZeroShot",
-    "CIFAR10ZeroShot",
-    "CIFAR100ZeroShot",
-    "CLEVRZeroShot",
-    "CLEVRCountZeroShot",
-    "Country211ZeroShot",
-    "DTDZeroShot",
-    "EuroSATZeroShot",
-    "FER2013ZeroShot",
-    "FGVCAircraftZeroShot",
-    "Food101ZeroShot",
-    "GTSRBZeroShot",
-    "Imagenet1kZeroShot",
-    "MNISTZeroShot",
-    "OxfordPetsZeroShot",
-    "PatchCamelyonZeroShot",
-    "RenderedSST2",
-    "RESISC45ZeroShot",
-    "StanfordCarsZeroShot",
-    "STL10ZeroShot",
-    "SUN397ZeroShot",
-    "UCF101ZeroShot",
+    # "BirdsnapZeroShot",
+    # "Caltech101ZeroShot",
+    # "CIFAR10ZeroShot",
+    # "CIFAR100ZeroShot",
+    # "CLEVRZeroShot",
+    # "CLEVRCountZeroShot",
+    # "Country211ZeroShot",
+    # "DTDZeroShot",
+    # "EuroSATZeroShot",
+    # "FER2013ZeroShot",
+    # "FGVCAircraftZeroShot",
+    # "Food101ZeroShot",
+    # "GTSRBZeroShot",
+    # "Imagenet1kZeroShot",
+    # "MNISTZeroShot",
+    # "OxfordPetsZeroShot",
+    # "PatchCamelyonZeroShot",
+    # "RenderedSST2",
+    # "RESISC45ZeroShot",
+    # "StanfordCarsZeroShot",
+    # "STL10ZeroShot",
+    # "SUN397ZeroShot",
+    # "UCF101ZeroShot",
     # Any2TextMutipleChoice
     "CVBenchCount",
     "CVBenchRelation",
@@ -1484,11 +1484,11 @@ MIEB_common_tasks = [
     "SugarCrepe",
     "Winoground",
     # VisualSTS
-    "STS12VisualSTS",
-    "STS13VisualSTS",
-    "STS14VisualSTS",
-    "STS15VisualSTS",
-    "STS16VisualSTS",
+    # "STS12VisualSTS",
+    # "STS13VisualSTS",
+    # "STS14VisualSTS",
+    # "STS15VisualSTS",
+    # "STS16VisualSTS",
     # Any2AnyRetrieval
     "BLINKIT2IRetrieval",
     "BLINKIT2TRetrieval",

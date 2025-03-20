@@ -11,14 +11,16 @@ from mteb.abstasks.AbsTask import AbsTask
 from mteb.load_results.benchmark_results import BenchmarkResults, ModelResult
 from mteb.load_results.task_results import TaskResult
 from mteb.model_meta import ModelMeta
-import pdb
+
 logger = logging.getLogger(__name__)
 MODEL_NAME = str
 REVISION = str
 
 
 def download_of_results(
-    results_repo: str, cache_directory: Path | None = None, download_latest: bool = False
+    results_repo: str,
+    cache_directory: Path | None = None,
+    download_latest: bool = False,
 ) -> Path:
     """Downloads the latest version of the results repository from GitHub to a local cache directory. Required git to be installed.
 
@@ -154,6 +156,7 @@ def load_results(
             ]
             _results = []
             for f in task_json_files:
+                # pdb.set_trace()
                 task_res = TaskResult.from_disk(f)
                 if only_main_score:
                     task_res = task_res.only_main_score()

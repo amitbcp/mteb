@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import argparse
 import logging
 import os
 
@@ -47,7 +46,9 @@ def load_leaderboard(
         raise ValueError(
             f"Benchmark '{benchmark_name}' not found. Available: {get_available_benchmarks()}"
         )
-    import pdb; pdb.set_trace()
+    import pdb
+
+    pdb.set_trace()
     # Load all results from the specified repository
     benchmark_results = load_results(
         results_repo=results_repo,
