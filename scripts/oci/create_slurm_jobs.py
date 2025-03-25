@@ -90,9 +90,9 @@ if __name__ == "__main__":
 
 
     # project_root = Path(__file__).parent / ".." / ".." / ".."
-    results_folder = Path(__file__) / "results"
+    results_folder = Path(__file__).parent / "results"
     # results_folder = Path("/data/niklas/results")
-    slurm_jobs_folder = Path(__file__) / "slurm_jobs"
+    slurm_jobs_folder = Path(__file__).parent / "slurm_jobs"
 
     tasks = mteb.get_tasks(languages=["eng"],modalities=["text", "image"],
                        task_types=args.task_type)
