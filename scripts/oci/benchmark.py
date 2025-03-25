@@ -15,8 +15,10 @@ def run_inference(model_name, task_type, batch_size, device):
     tasks = mteb.get_tasks(languages=["eng"],modalities=["text", "image"],task_types=task_type)
 
     for task in tasks :
+        task_name = task.metadata.name
         try :
-            evaluation = mteb.MTEB(tasks=task)
+
+            evaluation = mteb.MTEB(tasks=[task_name])
 
             results = evaluation.run(model,save_corpus_embeddings=True,device=device,
                                 save_predictions=True, export_errors=True, verbosity= 2,
@@ -28,10 +30,10 @@ def run_inference(model_name, task_type, batch_size, device):
                 os.makedirs(results_path,exist_ok=True)
                 print("Results Path Exists...")
 
-            with open(f"{results_path}/{task}.pkl", "wb") as f:
+            with open(f"{results_path}/{task_name}.pkl", "wb") as f:
                 pickle.dump(results, f)
 
-            print(f"SUCCESS !! Task : {task} | TaskType : {task_type}")
+            print(f"SUCCESS !! Task : {task_name} | TaskType : {task_type}")
         except :
             print(f"*****************ERROR/FAIL !! Task : {task} | TaskType : {task_type}")
             traceback.print_exc()
