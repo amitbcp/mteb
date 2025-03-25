@@ -13,7 +13,7 @@ def run_inference(model_name, task_type, batch_size, device):
     model = mteb.get_model(model_name)
     # specify what you want to evaluate it on
     tasks = mteb.get_tasks(languages=["eng"],modalities=["text", "image"],task_types=task_type)
-    p1 = len(tasks)//2
+    p1 = len(tasks)//3
     for task in tasks[:p1] :
         task_name = task.metadata.name
         try :
