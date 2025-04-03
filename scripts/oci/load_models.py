@@ -1,6 +1,8 @@
 import os
+
 print("Loading MTEB......")
 import mteb
+
 print("MTEB loaded......")
 from sentence_transformers import SentenceTransformer
 import traceback
@@ -20,17 +22,17 @@ import traceback
 """
 
 models = [
-# royokong/e5-v
-# 'BAAI/bge-m3',
-# 'BAAI/bge-base-en-v1.5',
-'Alibaba-NLP/gme-Qwen2-VL-2B-Instruct',
-# 'Alibaba-NLP/gme-Qwen2-VL-7B-Instruct',
-# 'nyu-visionx/moco-v3-vit-b',
-# 'nyu-visionx/moco-v3-vit-l',
-# 'jinaai/jina-clip-v1',
-# 'Linq-AI-Research/Linq-Embed-Mistral',
-# 'embed-multilingual-v3.0-v', Some Other Error
-# 'embed-english-v3.0-v' Some Other Error
+    # royokong/e5-v
+    # 'BAAI/bge-m3',
+    # 'BAAI/bge-base-en-v1.5',
+    "Alibaba-NLP/gme-Qwen2-VL-2B-Instruct",
+    # 'Alibaba-NLP/gme-Qwen2-VL-7B-Instruct',
+    # 'nyu-visionx/moco-v3-vit-b',
+    # 'nyu-visionx/moco-v3-vit-l',
+    # 'jinaai/jina-clip-v1',
+    # 'Linq-AI-Research/Linq-Embed-Mistral',
+    # 'embed-multilingual-v3.0-v', Some Other Error
+    # 'embed-english-v3.0-v' Some Other Error
 ]
 
 comp_tasks = {
@@ -40,7 +42,7 @@ comp_tasks = {
     "AROVisualAttribution": "i2t",
     "AROVisualRelation": "i2t",
     "SugarCrepe": "i2t",
-    "Winoground": "i2t"
+    "Winoground": "i2t",
 }
 
 vrd_tasks = {
@@ -50,13 +52,10 @@ vrd_tasks = {
     "AROVisualAttribution": "i2t",
     "AROVisualRelation": "i2t",
     "SugarCrepe": "i2t",
-    "Winoground": "i2t"
+    "Winoground": "i2t",
 }
 
-vision_tasks = {
-    "BLINKIT2IMultiChoice": "it2i"
-}
-
+vision_tasks = {"BLINKIT2IMultiChoice": "it2i"}
 
 
 a2a_tasks = {
@@ -114,7 +113,7 @@ a2a_tasks = {
     "VizWizIT2TRetrieval": "it2t",
     "VQA2IT2TRetrieval": "it2t",
     "WebQAT2ITRetrieval": "t2it",
-    "WebQAT2TRetrieval": "t2t"
+    "WebQAT2TRetrieval": "t2t",
 }
 
 vidore_tasks = {
@@ -127,10 +126,8 @@ vidore_tasks = {
     "VidoreSyntheticDocQAAIRetrieval": "t2i",
     "VidoreSyntheticDocQAEnergyRetrieval": "t2i",
     "VidoreSyntheticDocQAGovernmentReportsRetrieval": "t2i",
-    "VidoreSyntheticDocQAHealthcareIndustryRetrieval": "t2i"
+    "VidoreSyntheticDocQAHealthcareIndustryRetrieval": "t2i",
 }
-
-
 
 
 # model_name = "BAAI/bge-m3"
@@ -143,52 +140,63 @@ vidore_tasks = {
 #         traceback.print_exc()
 
 print("Loading Model .....")
-model = mteb.get_model('Alibaba-NLP/gme-Qwen2-VL-2B-Instruct')
+model = mteb.get_model("Alibaba-NLP/gme-Qwen2-VL-2B-Instruct")
 print("Model Loaded.....")
-for key, value in vrd_tasks.items() :
+for key, value in vrd_tasks.items():
     print(f"*****************VRD Dataset : {key}")
-    try :
-
+    try:
         tasks = mteb.get_tasks(tasks=[key])
         evaluation = mteb.MTEB(tasks=tasks)
-        results = evaluation.run(model, output_folder=f"results/{model}",
-                                        batch_size=8, save_corpus_embeddings=True,
-                                        save_predictions=True, export_errors=True, verbosity= 3
-                                        )
+        results = evaluation.run(
+            model,
+            output_folder=f"results/{model}",
+            batch_size=8,
+            save_corpus_embeddings=True,
+            save_predictions=True,
+            export_errors=True,
+            verbosity=3,
+        )
 
-    except :
+    except:
         print(f"*****************VRD_ERROR : {key}")
         traceback.print_exc()
 
 
-for key, value in a2a_tasks.items() :
+for key, value in a2a_tasks.items():
     print(f"*****************A2A Dataset : {key}")
-    try :
-
+    try:
         tasks = mteb.get_tasks(tasks=[key])
         evaluation = mteb.MTEB(tasks=tasks)
-        results = evaluation.run(model, output_folder=f"results/{model}",
-                                        batch_size=8, save_corpus_embeddings=True,
-                                        save_predictions=True, export_errors=True, verbosity= 3
-                                        )
+        results = evaluation.run(
+            model,
+            output_folder=f"results/{model}",
+            batch_size=8,
+            save_corpus_embeddings=True,
+            save_predictions=True,
+            export_errors=True,
+            verbosity=3,
+        )
 
-    except :
+    except:
         print(f"*****************A2A_ERROR : {key}")
         traceback.print_exc()
 
 
-
-for key, value in vidore_tasks.items() :
+for key, value in vidore_tasks.items():
     print(f"*****************Visual Documents Dataset : {key}")
-    try :
-
+    try:
         tasks = mteb.get_tasks(tasks=[key])
         evaluation = mteb.MTEB(tasks=tasks)
-        results = evaluation.run(model, output_folder=f"results/{model}",
-                                        batch_size=8, save_corpus_embeddings=True,
-                                        save_predictions=True, export_errors=True, verbosity= 3
-                                        )
+        results = evaluation.run(
+            model,
+            output_folder=f"results/{model}",
+            batch_size=8,
+            save_corpus_embeddings=True,
+            save_predictions=True,
+            export_errors=True,
+            verbosity=3,
+        )
 
-    except :
+    except:
         print(f"*****************Visual Documents : {key}")
         traceback.print_exc()
