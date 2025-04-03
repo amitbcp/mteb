@@ -18,7 +18,9 @@ REVISION = str
 
 
 def download_of_results(
-    results_repo: str, cache_directory: Path | None = None, download_latest: bool = True
+    results_repo: str,
+    cache_directory: Path | None = None,
+    download_latest: bool = False,
 ) -> Path:
     """Downloads the latest version of the results repository from GitHub to a local cache directory. Required git to be installed.
 
@@ -30,6 +32,7 @@ def download_of_results(
     Returns:
         The path to the local cache directory.
     """
+    # pdb.set_trace()
     default_cache_directory = Path.home() / ".cache" / "mteb"
 
     if cache_directory is None:
@@ -85,7 +88,7 @@ def _model_name_and_revision(
 
 def load_results(
     results_repo: str = "https://github.com/embeddings-benchmark/results",
-    download_latest: bool = True,
+    download_latest: bool = False,
     models: Sequence[ModelMeta] | Sequence[str] | None = None,
     tasks: Sequence[AbsTask] | Sequence[str] | None = None,
     validate_and_filter: bool = True,
@@ -106,9 +109,11 @@ def load_results(
             splits from the results object that are not default in the task metadata. Defaults to True.
         only_main_score: If True, only the main score will be loaded.
     """
+    # import pdb; pdb.set_trace()
     repo_directory = download_of_results(results_repo, download_latest=download_latest)
+    # import pdb; pdb.set_trace()
     model_paths = [p for p in (repo_directory / "results").glob("*") if p.is_dir()]
-
+    # import pdb; pdb.set_trace()
     if models is not None:
         models_to_keep = {}
         for model_path in models:
@@ -151,6 +156,7 @@ def load_results(
             ]
             _results = []
             for f in task_json_files:
+                # pdb.set_trace()
                 task_res = TaskResult.from_disk(f)
                 if only_main_score:
                     task_res = task_res.only_main_score()
