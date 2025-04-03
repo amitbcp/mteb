@@ -1412,36 +1412,6 @@ BEIR_NL = Benchmark(
 
 MIEB_common_tasks = [
     # Image Classification
-    # "Birdsnap",  # fine
-    # "Caltech101",  # fine
-    # "CIFAR10",  # coarse
-    # "CIFAR100",  # fine
-    # "Country211",  # fine
-    # "DTD",  # coarse
-    # "EuroSAT",  # coarse
-    # "FER2013",  # coarse
-    # "FGVCAircraft",  # fine
-    # "Food101Classification",  # fine
-    # "GTSRB",  # coarse
-    # "Imagenet1k",  # fine
-    # "MNIST",  # coarse
-    # "OxfordFlowersClassification",  # fine
-    # "OxfordPets",  # fine
-    # "PatchCamelyon",  # coarse
-    # "RESISC45",  # fine
-    # "StanfordCars",  # fine
-    # "STL10",  # coarse
-    # "SUN397",  # fine
-    # "UCF101",  # fine
-    # ImageMultiLabelClassification
-    # "VOC2007",  # coarse
-    # Clustering
-    # "CIFAR10Clustering",
-    # "CIFAR100Clustering",
-    # "ImageNetDog15Clustering",
-    # "ImageNet10Clustering",
-    # "TinyImageNetClustering",
-    # ZeroShotClassification
     "BirdsnapZeroShot",
     "Caltech101ZeroShot",
     "CIFAR10ZeroShot",
