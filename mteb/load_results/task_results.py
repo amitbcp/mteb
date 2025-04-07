@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import pdb
 from argparse import Namespace
 from collections import defaultdict
 from collections.abc import Iterable
@@ -293,6 +294,7 @@ class TaskResult(BaseModel):
             logger.debug(
                 f"Could not load TaskResult from disk, got error: {e}. Attempting to load from disk using format from before v1.11.0"
             )
+            pdb.set_trace()
             obj = cls._convert_from_before_v1_11_0(data)
 
         pre_v_12_48 = (
@@ -338,7 +340,12 @@ class TaskResult(BaseModel):
         dataset_revision = scores.pop(
             "dataset_revision", "dataset revision not available"
         )
-        task_name = scores.pop("mteb_dataset_name")
+
+        try:
+            task_name = scores.pop("mteb_dataset_name")
+        except:
+            pdb.set_trace()
+            task_name = scores.pop("task_name")
         mteb_version = scores.pop("mteb_version", "mteb version not available")
 
         # calculate evaluation time across all splits (move to top level)
