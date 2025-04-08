@@ -9,6 +9,12 @@ from PIL import Image
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from transformers import AutoConfig, AutoModelForCausalLM, AutoProcessor, Qwen2VLForConditionalGeneration
+from src.vlm_backbone.qwen2_vl import Qwen2VLForConditionalGeneration
+# from src.vlm_backbone.qwen2_vl.processing_qwen2_vl import Qwen2VLProcessor
+# from src.vlm_backbone.qwen2_vl.image_processing_qwen2_vl import Qwen2VLImageProcessor
+# from src.vlm_backbone.qwen2_vl.tokenization_qwen2_fast import Qwen2TokenizerFast
+# from src.vlm_backbone.qwen2_vl import Qwen2VLForConditionalGeneration
+
 import pdb
 from mteb.encoder_interface import PromptType
 from mteb.model_meta import ModelMeta
@@ -61,7 +67,7 @@ class VLM2VecQwen2Wrapper:
         base_model = Qwen2VLForConditionalGeneration.from_pretrained(
             base_model_name,
             config=config,
-            # attn_implementation="flash_attention_2",
+            attn_implementation="flash_attention_2",
             torch_dtype=torch.bfloat16,
             trust_remote_code=True,
         )
@@ -89,7 +95,15 @@ class VLM2VecQwen2Wrapper:
         model.eval()
         model.to(device)
         self.mdl = model
-
+        # print(base_model_name)
+        # image_processor = Qwen2VLImageProcessor.from_pretrained(base_model_name)
+        # tokenizer = Qwen2TokenizerFast.from_pretrained(base_model_name)
+        # self.processor = Qwen2VLProcessor.from_pretrained(
+        #     base_model_name,
+        #     image_processor=image_processor, tokenizer=tokenizer,
+        #     min_pixels=256 * 28 * 28, max_pixels=1280 * 28 * 28
+        # )
+        
         self.processor = AutoProcessor.from_pretrained(
             base_model_name,
             trust_remote_code=True,
