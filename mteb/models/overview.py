@@ -63,6 +63,7 @@ from mteb.models import (
     promptriever_models,
     qodo_models,
     qtack_models,
+    qwen_25_vl_models,
     repllama_models,
     rerankers_custom,
     rerankers_monot5_based,
@@ -78,9 +79,10 @@ from mteb.models import (
     uae_models,
     vdr_models,
     vista_models,
-    vlm2vec_models,
+    vlm2vec_models,vlm2vec_qwen2_models,
     voyage_models,
     voyage_v,
+
 )
 
 logger = logging.getLogger(__name__)
@@ -130,6 +132,7 @@ model_modules = [
     ops_moa_models,
     piccolo_models,
     gme_v_models,
+    qwen_25_vl_models,
     promptriever_models,
     qodo_models,
     qtack_models,
@@ -144,6 +147,7 @@ model_modules = [
     siglip_models,
     vista_models,
     vlm2vec_models,
+    vlm2vec_qwen2_models,
     voyage_v,
     stella_models,
     sonar_models,
