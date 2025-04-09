@@ -358,10 +358,11 @@ class VLM2VecQwen2Wrapper:
                 for batch in images:
                     input_ids, pixel_values, image_grid_thw = [], [], []
                     for b in batch:
+                        # pdb.set_trace()
                         text = next(texts)
                         inputs = self.processor(
-                            f"<|image_pad|> Represent the given image with the following question: {text}",
-                            [F.to_pil_image(b.to("cpu"))],
+                            text = f"<|image_pad|> Represent the given image with the following question: {text}",
+                            images = [F.to_pil_image(b.to("cpu"))],
                             return_tensors="pt",
                             # max_length=256,
                             truncation=True,
