@@ -57,7 +57,15 @@ class VLM2VecQwen2Wrapper:
         self.device = device
 
         # Loading the base model
-        base_model_name = "Qwen/Qwen2-VL-2B-Instruct"
+        if "VLM2Vec-Qwen2VL-2B" in model_name :
+            base_model_name = "Qwen/Qwen2-VL-2B-Instruct"
+        elif "VLM2Vec-Qwen2VL-7B" in model_name :
+            base_model_name = "Qwen/Qwen2-VL-7B-Instruct"
+        else :
+            print("WTF")
+            print(model_name)
+            print(**kwargs)
+
         config = AutoConfig.from_pretrained(base_model_name, trust_remote_code=True)
         config.use_cache = False
         # config.padding_side = "left"
