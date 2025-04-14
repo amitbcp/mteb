@@ -551,7 +551,7 @@ vlm2vec_qwen2_8k_alldata_full = ModelMeta(
     training_datasets=vlm2vec_training_datasets,
 )
 
-vlm2vec_qwen2_8k_alldata_lora = ModelMeta(
+vlm2vec_qwen2_8k_alldata_lora_singlecore = ModelMeta(
     loader=partial(
         VLM2VecQwen2Wrapper,
         model_name="/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-ord-data-all-8k/checkpoint-72500",
