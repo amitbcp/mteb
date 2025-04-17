@@ -482,7 +482,7 @@ vlm2vec_qwen2 = ModelMeta(
         model_name="TIGER-Lab/VLM2Vec-Qwen2VL-2B",
     ),
     name="TIGER-Lab/VLM2Vec-Qwen2VL-2B",
-    languages=["eng_Latn"],
+    languages=["eng-Latn"],
     revision="7717deedf0631e6f520b7c83c8f82dcbc2c4c21e",
     release_date="2024-10-08",
     modalities=["image", "text"],
@@ -507,7 +507,7 @@ vlm2vec_qwen7 = ModelMeta(
         model_name="TIGER-Lab/VLM2Vec-Qwen2VL-7B",
     ),
     name="TIGER-Lab/VLM2Vec-Qwen2VL-7B",
-    languages=["eng_Latn"],
+    languages=["eng-Latn"],
     revision="f2f1c2194823b780632c628548d85a03939d896c",
     release_date="2024-10-08",
     modalities=["image", "text"],
@@ -532,7 +532,7 @@ vlm2vec_qwen2_8k_alldata_full = ModelMeta(
         model_name="/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-ord-data-all-8k-full",
     ),
     name="OCI/VLM2Vec-Qwen2VL-2B-8K-all-data-full",
-    languages=["eng_Latn"],
+    languages=["eng-Latn"],
     revision="f2f1c2194823b780632c628548d85a03939d896c",
     release_date="2024-10-08",
     modalities=["image", "text"],
@@ -551,13 +551,14 @@ vlm2vec_qwen2_8k_alldata_full = ModelMeta(
     training_datasets=vlm2vec_training_datasets,
 )
 
-vlm2vec_qwen2_8k_alldata_lora_singlecore = ModelMeta(
+
+vlm2vec_qwen2_8k_alldata_lora_single_core = ModelMeta(
     loader=partial(
         VLM2VecQwen2Wrapper,
         model_name="/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-ord-data-all-8k/checkpoint-72500",
     ),
     name="OCI/VLM2Vec-Qwen2VL-2B-8K-all-data-lora",
-    languages=["eng_Latn"],
+    languages=["eng-Latn"],
     revision="f2f1c2194823b780632c628548d85a03939d896c",
     release_date="2024-10-08",
     modalities=["image", "text"],
@@ -582,7 +583,7 @@ vlm2vec_qwen2_8k_alldata_lora = ModelMeta(
         model_name="/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/multinode/checkpoint-25000",
     ),
     name="OCI/VLM2Vec-Qwen2VL-2B-8K-all-data-lora-multinode",
-    languages=["eng_Latn"],
+    languages=["eng-Latn"],
     revision="f2f1c2194823b780632c628548d85a03939d896c",
     release_date="2024-10-08",
     modalities=["image", "text"],
@@ -607,7 +608,7 @@ vlm2vec_qwen2_phx_test = ModelMeta(
         model_name="/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-test-data-all/checkpoint-50000/",
     ),
     name="OCI/VLM2Vec-Qwen2VL-PHX-Test",
-    languages=["eng_Latn"],
+    languages=["eng-Latn"],
     revision="f2f1c2194823b780632c628548d85a03939d896c",
     release_date="2024-10-08",
     modalities=["image", "text"],

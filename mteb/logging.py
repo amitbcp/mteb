@@ -23,6 +23,8 @@ def enable_explicit_format() -> None:
 
     for handler in handlers:
         formatter = logging.Formatter(
-            "[%(levelname)s|%(filename)s:%(lineno)s] %(asctime)s >> %(message)s"
+            # "[%(levelname)s|%(filename)s:%(lineno)s] %(asctime)s >> %(message)s"
+            # "%(asctime)s - %(levelname)s - %(name)s:%(lineno)d - %(message)s"
+            "[%(levelname)s|%(filename)s:%(lineno)d] %(asctime)s >> %(message)s"
         )
         handler.setFormatter(formatter)
