@@ -5,7 +5,8 @@ from __future__ import annotations
 import difflib
 import logging
 from collections import Counter, defaultdict
-
+import traceback
+import pdb
 import pandas as pd
 
 from mteb.abstasks.AbsTask import AbsTask
@@ -388,7 +389,12 @@ def get_task(
         >>> get_task("BornholmBitextMining")
     """
     if task_name not in TASKS_REGISTRY:
-        close_matches = difflib.get_close_matches(task_name, TASKS_REGISTRY.keys())
+        try :
+            close_matches = difflib.get_close_matches(task_name, TASKS_REGISTRY.keys())
+        except :
+            traceback.print_exc()
+            pdb.set_trace()
+
         if close_matches:
             suggestion = (
                 f"KeyError: '{task_name}' not found. Did you mean: {close_matches[0]}?"

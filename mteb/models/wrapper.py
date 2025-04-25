@@ -2,11 +2,11 @@ from __future__ import annotations
 
 import logging
 from typing import Callable, get_args
-
+import pdb
 import mteb
 from mteb.abstasks.TaskMetadata import TASK_TYPE
 from mteb.encoder_interface import PromptType
-
+import traceback
 logger = logging.getLogger(__name__)
 
 
@@ -90,7 +90,12 @@ class Wrapper:
     @staticmethod
     def get_instruction(task_name: str, prompt_type: PromptType | None) -> str:
         """Get the instruction/prompt to be used for encoding sentences."""
-        task = mteb.get_task(task_name=task_name)
+
+        try :
+            task = mteb.get_task(task_name=task_name)
+        except :
+            traceback.print_exc()
+            pdb.set_trace()
         task_metadata = task.metadata
         if isinstance(task_metadata.prompt, dict) and prompt_type:
             if task_metadata.prompt.get(prompt_type.value):
