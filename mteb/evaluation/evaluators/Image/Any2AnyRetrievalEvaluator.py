@@ -15,6 +15,7 @@ import torch
 from datasets import Dataset
 from PIL import Image
 from torch.utils.data import DataLoader
+import pdb
 
 from mteb.encoder_interface import Encoder, PromptType
 from mteb.requires_package import requires_image_dependencies
@@ -146,7 +147,8 @@ class Any2AnyDenseRetrievalExactSearch:
                 batch_size=self.encode_kwargs["batch_size"],
                 shuffle=False,
                 collate_fn=custom_collate_fn,
-                num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                # num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                num_workers=min(0, 16),
             )
             if q_modality == "image":
                 query_embeddings = self.model.get_image_embeddings(
@@ -203,7 +205,9 @@ class Any2AnyDenseRetrievalExactSearch:
                     batch_size=self.encode_kwargs["batch_size"],
                     shuffle=False,
                     collate_fn=custom_collate_fn,
-                    num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                    # num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                    num_workers=min(0, 16),
+
                 )
                 if corpus_modality == "image":
                     sub_corpus_embeddings = self.model.get_image_embeddings(
@@ -309,16 +313,31 @@ class Any2AnyRetrievalEvaluator(Evaluator):
         corpus: dict[str, dict[str, str | Image.Image]],
         queries: dict[str, dict[str, str | Image.Image]],
     ) -> dict[str, dict[str, float]]:
+        # pdb.set_trace()
         if not self.retriever:
             raise ValueError("Model/Technique has not been provided!")
 
-        return self.retriever.search(
-            corpus,
-            queries,
-            self.top_k,
-            self.score_function,
-            task_name=self.task_name,
-        )
+        if (
+            hasattr(self.retriever.model, "mteb_model_meta")
+            and self.retriever.model.mteb_model_meta.name in ["llama4bm25","gpt4obm25","gpt4ominibm25"]
+        ):
+            # pdb.set_trace()
+            return self.retriever.model.search_image(
+                corpus,
+                queries,
+                self.top_k,
+                score_function="bm25",
+                encode_kwargs = {"batch_size": 1},
+                task_name=self.task_name,  # type: ignore
+            )
+        else :
+            return self.retriever.search(
+                corpus,
+                queries,
+                self.top_k,
+                self.score_function,
+                task_name=self.task_name,
+            )
 
     @staticmethod
     def evaluate(
@@ -371,7 +390,7 @@ class Any2AnyRetrievalEvaluator(Evaluator):
             qrels, {map_string, ndcg_string, recall_string, precision_string}
         )
         scores = evaluator.evaluate(results)
-
+        # pdb.set_trace()
         sorted_results = {
             qid: sorted(rels.items(), key=lambda item: item[1], reverse=True)
             for qid, rels in results.items()

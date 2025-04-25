@@ -144,7 +144,8 @@ class Any2AnyMultiChoiceSearch:
                 batch_size=self.encode_kwargs["batch_size"],
                 shuffle=False,
                 collate_fn=custom_collate_fn,
-                num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                # num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                num_workers=min(0, 16),
             )
             if q_modality == "image":
                 query_embeddings = self.model.get_image_embeddings(
@@ -196,7 +197,8 @@ class Any2AnyMultiChoiceSearch:
                     batch_size=self.encode_kwargs["batch_size"],
                     shuffle=False,
                     collate_fn=custom_collate_fn,
-                    num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                    # num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                    num_workers=min(0, 16),
                 )
                 if corpus_modality == "image":
                     sub_corpus_embeddings = self.model.get_image_embeddings(
@@ -310,14 +312,29 @@ class Any2AnyMultiChoiceEvaluator(Evaluator):
         if not self.retriever:
             raise ValueError("Model/Technique has not been provided!")
 
-        return self.retriever.search(
-            corpus,
-            queries,
-            qrels,
-            self.top_k,
-            self.score_function,
-            task_name=self.task_name,  # type: ignore
-        )
+        if (
+            hasattr(self.retriever.model, "mteb_model_meta")
+            and self.retriever.model.mteb_model_meta.name in ["llama4bm25","gpt4obm25","gpt4ominibm25"]
+        ):
+            # pdb.set_trace()
+            return self.retriever.model.search_image(
+                corpus,
+                queries,
+                self.top_k,
+                score_function="bm25",
+                encode_kwargs = {"batch_size": 1},
+                task_name=self.task_name,  # type: ignore
+            )
+        else :
+
+            return self.retriever.search(
+                corpus,
+                queries,
+                qrels,
+                self.top_k,
+                self.score_function,
+                task_name=self.task_name,  # type: ignore
+            )
 
     @staticmethod
     def evaluate(
