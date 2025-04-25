@@ -79,8 +79,7 @@ TASK_DOMAIN = Literal[
     "Programming",
     "Chemistry",
     "Financial",
-    "Chemistry",
-    "Financial",
+    "Entertainment",
 ]
 
 SAMPLE_CREATION_METHOD = Literal[
@@ -111,7 +110,7 @@ MIEB_TASK_TYPE = (
     "Compositionality",
 )
 
-TASK_TYPE = (
+_TASK_TYPE = (
     "BitextMining",
     "Classification",
     "MultilabelClassification",
@@ -125,7 +124,7 @@ TASK_TYPE = (
     "Speed",
 ) + MIEB_TASK_TYPE
 
-TASK_TYPE = Literal[TASK_TYPE]
+TASK_TYPE = Literal[_TASK_TYPE]
 
 
 TASK_CATEGORY = Literal[
