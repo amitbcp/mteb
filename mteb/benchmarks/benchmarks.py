@@ -17,12 +17,12 @@ UrlString = Annotated[
 
 
 MMTEB_CITATION = """@article{enevoldsen2025mmtebmassivemultilingualtext,
-    title={MMTEB: Massive Multilingual Text Embedding Benchmark}, 
+    title={MMTEB: Massive Multilingual Text Embedding Benchmark},
     author={Kenneth Enevoldsen and Isaac Chung and Imene Kerboua and Márton Kardos and Ashwin Mathur and David Stap and Jay Gala and Wissam Siblini and Dominik Krzemiński and Genta Indra Winata and Saba Sturua and Saiteja Utpala and Mathieu Ciancone and Marion Schaeffer and Gabriel Sequeira and Diganta Misra and Shreeya Dhakal and Jonathan Rystrøm and Roman Solomatin and Ömer Çağatan and Akash Kundu and Martin Bernstorff and Shitao Xiao and Akshita Sukhlecha and Bhavish Pahwa and Rafał Poświata and Kranthi Kiran GV and Shawon Ashraf and Daniel Auras and Björn Plüster and Jan Philipp Harries and Loïc Magne and Isabelle Mohr and Mariya Hendriksen and Dawei Zhu and Hippolyte Gisserot-Boukhlef and Tom Aarsen and Jan Kostkan and Konrad Wojtasik and Taemin Lee and Marek Šuppa and Crystina Zhang and Roberta Rocca and Mohammed Hamdy and Andrianos Michail and John Yang and Manuel Faysse and Aleksei Vatolin and Nandan Thakur and Manan Dey and Dipam Vasani and Pranjal Chitale and Simone Tedeschi and Nguyen Tai and Artem Snegirev and Michael Günther and Mengzhou Xia and Weijia Shi and Xing Han Lù and Jordan Clive and Gayatri Krishnakumar and Anna Maksimova and Silvan Wehrli and Maria Tikhonova and Henil Panchal and Aleksandr Abramov and Malte Ostendorff and Zheng Liu and Simon Clematide and Lester James Miranda and Alena Fenogenova and Guangyu Song and Ruqiya Bin Safi and Wen-Ding Li and Alessia Borghini and Federico Cassano and Hongjin Su and Jimmy Lin and Howard Yen and Lasse Hansen and Sara Hooker and Chenghao Xiao and Vaibhav Adlakha and Orion Weller and Siva Reddy and Niklas Muennighoff},
     publisher = {arXiv},
     journal={arXiv preprint arXiv:2502.13595},
     year={2025},
-    url={https://arxiv.org/abs/2502.13595}, 
+    url={https://arxiv.org/abs/2502.13595},
     doi = {10.48550/arXiv.2502.13595},
 }"""
 
@@ -226,9 +226,12 @@ MTEB_MAIN_RU = Benchmark(
             "RuBQRetrieval",
             # STS
             "RUParaPhraserSTS",
-            "RuSTSBenchmarkSTS",
             "STS22",
         ],
+    )
+    + get_tasks(
+        tasks=["RuSTSBenchmarkSTS"],
+        eval_splits=["test"],
     ),
     description="A Russian version of the Massive Text Embedding Benchmark with a number of novel Russian tasks in all task categories of the original MTEB.",
     reference="https://aclanthology.org/2023.eacl-main.148/",
@@ -1597,16 +1600,16 @@ MIEB_ENG = Benchmark(
     description="""MIEB(eng) is a comprehensive image embeddings benchmark, spanning 8 task types, covering 125 tasks.
     In addition to image classification (zero shot and linear probing), clustering, retrieval, MIEB includes tasks in compositionality evaluation,
     document undestanding, visual STS, and CV-centric tasks.""",
-    reference="",
+    reference="https://arxiv.org/abs/2504.10471",
     contacts=["gowitheflow-1998", "isaac-chung"],
-    citation="""@article{xiao2025mieb,
-    author = {Chenghao Xiao and Isaac Chung and Imene Kerboua and Jamie Stirling and Xin Zhang and Márton Kardos and Roman Solomatin and Noura Al Moubayed and Kenneth Enevoldsen and Niklas Muennighoff},
-    title = {MIEB: Massive Image Embedding Benchmark},
-    publisher = {arXiv},
-    journal={arXiv preprint arXiv:2504.10471},
-    year = {2025},
-    url = {https://arxiv.org/abs/2504.10471},
-    doi = {10.48550/ARXIV.2504.10471},
+    citation="""@misc{xiao2025miebmassiveimageembedding,
+      title={MIEB: Massive Image Embedding Benchmark},
+      author={Chenghao Xiao and Isaac Chung and Imene Kerboua and Jamie Stirling and Xin Zhang and Márton Kardos and Roman Solomatin and Noura Al Moubayed and Kenneth Enevoldsen and Niklas Muennighoff},
+      year={2025},
+      eprint={2504.10471},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2504.10471},
     }""",
 )
 
@@ -1630,16 +1633,16 @@ MIEB_MULTILINGUAL = Benchmark(
     In addition to image classification (zero shot and linear probing), clustering, retrieval, MIEB includes tasks in compositionality evaluation,
     document undestanding, visual STS, and CV-centric tasks. This benchmark consists of MIEB(eng) + 3 multilingual retrieval
     datasets + the multilingual parts of VisualSTS-b and VisualSTS-16.""",
-    reference="",
+    reference="https://arxiv.org/abs/2504.10471",
     contacts=["gowitheflow-1998", "isaac-chung"],
-    citation="""@article{xiao2025mieb,
-    author = {Chenghao Xiao and Isaac Chung and Imene Kerboua and Jamie Stirling and Xin Zhang and Márton Kardos and Roman Solomatin and Noura Al Moubayed and Kenneth Enevoldsen and Niklas Muennighoff},
-    title = {MIEB: Massive Image Embedding Benchmark},
-    publisher = {arXiv},
-    journal={arXiv preprint arXiv:2504.10471},
-    year = {2025},
-    url = {https://arxiv.org/abs/2504.10471},
-    doi = {10.48550/ARXIV.2504.10471},
+    citation="""@misc{xiao2025miebmassiveimageembedding,
+      title={MIEB: Massive Image Embedding Benchmark},
+      author={Chenghao Xiao and Isaac Chung and Imene Kerboua and Jamie Stirling and Xin Zhang and Márton Kardos and Roman Solomatin and Noura Al Moubayed and Kenneth Enevoldsen and Niklas Muennighoff},
+      year={2025},
+      eprint={2504.10471},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2504.10471},
     }""",
 )
 
@@ -1712,17 +1715,86 @@ MIEB_LITE = Benchmark(
     description="""MIEB(lite) is a comprehensive image embeddings benchmark, spanning 10 task types, covering 51 tasks.
     This is a lite version of MIEB(Multilingual), designed to be run at a fraction of the cost while maintaining
     relative rank of models.""",
-    reference="",
+    reference="https://arxiv.org/abs/2504.10471",
     contacts=["gowitheflow-1998", "isaac-chung"],
-    citation="""@article{xiao2025mieb,
-    author = {Chenghao Xiao and Isaac Chung and Imene Kerboua and Jamie Stirling and Xin Zhang and Márton Kardos and Roman Solomatin and Noura Al Moubayed and Kenneth Enevoldsen and Niklas Muennighoff},
-    title = {MIEB: Massive Image Embedding Benchmark},
-    publisher = {arXiv},
-    journal={arXiv preprint arXiv:2504.10471},
-    year = {2025},
-    url = {https://arxiv.org/abs/2504.10471},
-    doi = {10.48550/ARXIV.2504.10471},
+    citation="""@misc{xiao2025miebmassiveimageembedding,
+      title={MIEB: Massive Image Embedding Benchmark},
+      author={Chenghao Xiao and Isaac Chung and Imene Kerboua and Jamie Stirling and Xin Zhang and Márton Kardos and Roman Solomatin and Noura Al Moubayed and Kenneth Enevoldsen and Niklas Muennighoff},
+      year={2025},
+      eprint={2504.10471},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2504.10471},
     }""",
+)
+
+MIEB_IMG = Benchmark(
+    name="MIEB(Img)",
+    tasks=get_tasks(
+        tasks=[
+            "CUB200I2IRetrieval",
+            "FORBI2IRetrieval",
+            "GLDv2I2IRetrieval",
+            "METI2IRetrieval",
+            "NIGHTSI2IRetrieval",
+            "ROxfordEasyI2IRetrieval",
+            "ROxfordMediumI2IRetrieval",
+            "ROxfordHardI2IRetrieval",
+            "RP2kI2IRetrieval",
+            "RParisEasyI2IRetrieval",
+            "RParisMediumI2IRetrieval",
+            "RParisHardI2IRetrieval",
+            "SketchyI2IRetrieval",
+            "SOPI2IRetrieval",
+            "StanfordCarsI2IRetrieval",
+            "Birdsnap",
+            "Caltech101",
+            "CIFAR10",
+            "CIFAR100",
+            "Country211",
+            "DTD",
+            "EuroSAT",
+            "FER2013",
+            "FGVCAircraft",
+            "Food101Classification",
+            "GTSRB",
+            "Imagenet1k",
+            "MNIST",
+            "OxfordFlowersClassification",
+            "OxfordPets",
+            "PatchCamelyon",
+            "RESISC45",
+            "StanfordCars",
+            "STL10",
+            "SUN397",
+            "UCF101",
+            "CIFAR10Clustering",
+            "CIFAR100Clustering",
+            "ImageNetDog15Clustering",
+            "ImageNet10Clustering",
+            "TinyImageNetClustering",
+            "VOC2007",
+            "STS12VisualSTS",
+            "STS13VisualSTS",
+            "STS14VisualSTS",
+            "STS15VisualSTS",
+            "STS16VisualSTS",
+            "STS17MultilingualVisualSTS",
+            "STSBenchmarkMultilingualVisualSTS",
+        ],
+    ),
+    description="A image-only version of MIEB(Multilingual) that consists of 49 tasks.",
+    reference="https://arxiv.org/abs/2504.10471",
+    citation="""@misc{xiao2025miebmassiveimageembedding,
+      title={MIEB: Massive Image Embedding Benchmark},
+      author={Chenghao Xiao and Isaac Chung and Imene Kerboua and Jamie Stirling and Xin Zhang and Márton Kardos and Roman Solomatin and Noura Al Moubayed and Kenneth Enevoldsen and Niklas Muennighoff},
+      year={2025},
+      eprint={2504.10471},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2504.10471},
+    }""",
+    contacts=["gowitheflow-1998", "isaac-chung"],
 )
 
 BUILT_MTEB = Benchmark(
@@ -1744,4 +1816,44 @@ BUILT_MTEB = Benchmark(
     year={2024}
 }""",
     contacts=["mehrzadshm"],
+)
+
+ENCODECHKA = Benchmark(
+    name="Encodechka",
+    tasks=MTEBTasks(
+        get_tasks(
+            tasks=[
+                # PI
+                "RUParaPhraserSTS",
+                # SA
+                "SentiRuEval2016",
+                # TI
+                "RuToxicOKMLCUPClassification",
+                # IA
+                "InappropriatenessClassificationv2",
+                # IC, ICX
+                "RuNLUIntentClassification",
+            ]
+        )
+        +
+        # NLI
+        get_tasks(tasks=["XNLI"], eval_splits=["test"], languages=["rus-Cyrl"])
+        # STS
+        + get_tasks(
+            tasks=["RuSTSBenchmarkSTS"],
+            eval_splits=["validation"],
+            languages=["rus-Cyrl"],
+        ),
+    ),
+    description="A benchmark for evaluating text embedding models on Russian data.",
+    reference="https://github.com/avidale/encodechka",
+    citation="""@misc{dale_encodechka,
+   author = "Dale, David",
+   title  = "Russian rating of sentence encoders",
+   editor = "habr.com",
+   url    = "https://habr.com/ru/articles/669674/",
+   month  = {June},
+   year   = {2022},
+   note = {[Online; posted 12-June-2022]},
+}""",
 )
