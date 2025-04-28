@@ -227,8 +227,8 @@ class Llama4BM25Wrapper:
         #     raise ValueError(
         #         f"score function: {score_function} must be either (cos_sim) for cosine similarity or (dot) for dot product"
         #     )
-        logger.info(f"Corpus Modality : {corpus[0]["modality"]}")
-        logger.info(f"Query Modality : {queries[0]["modality"]}")
+        logger.info(f"Corpus Modality : {corpus[0]['modality']}")
+        logger.info(f"Query Modality : {queries[0]['modality']}")
 
         logger.info("Preparing Corpus...")
         corpus_ids = list(corpus["id"])
