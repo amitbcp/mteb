@@ -14,13 +14,10 @@ from PIL import Image
 import bm25s
 import Stemmer
 
-import pytrec_eval
 import torch
 from datasets import Dataset
 from PIL import Image
 from torch.utils.data import DataLoader
-import math
-import os
 
 from tqdm import tqdm
 from .oci_utils import *
@@ -224,8 +221,8 @@ class GPT4OBM25Wrapper:
         #     raise ValueError(
         #         f"score function: {score_function} must be either (cos_sim) for cosine similarity or (dot) for dot product"
         #     )
-        logger.info(f"Corpus Modality : {corpus[0]["modality"]}")
-        logger.info(f"Query Modality : {queries[0]["modality"]}")
+        logger.info(f"Corpus Modality : {corpus[0]['modality']}")
+        logger.info(f"Query Modality : {queries[0]['modality']}")
 
         logger.info("Preparing Corpus...")
         corpus_ids = list(corpus["id"])

@@ -40,6 +40,10 @@ dependencies = [
     "typing_extensions>=0.0.0",
     "eval_type_backport>=0.0.0",
     "polars>=0.20.22",
+    "bm25s>=0.0.0",
+    "PyStemmer>=0.0.0",
+    "oci>=0.0.0",
+    "torchvision>=0.0.0"
 ]
 
 
