@@ -8,13 +8,17 @@ import torch
 from PIL import Image
 from torch.utils.data import DataLoader
 from tqdm import tqdm
-from transformers import AutoConfig, AutoModelForCausalLM, AutoProcessor #, Qwen2VLForConditionalGeneration
+from transformers import (
+    AutoConfig,
+    AutoModelForCausalLM,
+    AutoProcessor,
+)  # , Qwen2VLForConditionalGeneration
 from src.vlm_backbone.qwen2_vl import Qwen2VLForConditionalGeneration
 from src.vlm_backbone.qwen2_vl.processing_qwen2_vl import Qwen2VLProcessor
 from src.vlm_backbone.qwen2_vl.image_processing_qwen2_vl import Qwen2VLImageProcessor
 from src.vlm_backbone.qwen2_vl.tokenization_qwen2_fast import Qwen2TokenizerFast
 from src.vlm_backbone.qwen2_vl import Qwen2VLForConditionalGeneration
-
+from functools import partial
 import pdb
 from mteb.encoder_interface import PromptType
 from mteb.model_meta import ModelMeta
@@ -57,38 +61,50 @@ class Llama4Wrapper:
         self.device = device
         self.lora = True
 
-               # Loading the base model
-        if "TIGER-Lab/VLM2Vec-Qwen2VL-2B"==model_name :
+        # Loading the base model
+        if "TIGER-Lab/VLM2Vec-Qwen2VL-2B" == model_name:
             base_model_name = "Qwen/Qwen2-VL-2B-Instruct"
             self.lora = True
-        elif "TIGER-Lab/VLM2Vec-Qwen2VL-2B"==model_name :
+        elif "TIGER-Lab/VLM2Vec-Qwen2VL-2B" == model_name:
             base_model_name = "Qwen/Qwen2-VL-7B-Instruct"
             self.lora = True
-        elif "/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-ord-data-all-8k-full"==model_name :
+        elif (
+            "/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-ord-data-all-8k-full"
+            == model_name
+        ):
             base_model_name = "Qwen/Qwen2-VL-2B-Instruct"
             self.lora = False
-        elif "/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-ord-data-all-8k/checkpoint-72500"==model_name :
+        elif (
+            "/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-ord-data-all-8k/checkpoint-72500"
+            == model_name
+        ):
             base_model_name = "Qwen/Qwen2-VL-2B-Instruct"
             self.lora = True
-        elif "/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/multinode/checkpoint-25000"==model_name :
+        elif (
+            "/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/multinode/checkpoint-25000"
+            == model_name
+        ):
             base_model_name = "Qwen/Qwen2-VL-2B-Instruct"
             self.lora = True
-        elif "/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-test-data-all/checkpoint-50000/"==model_name :
+        elif (
+            "/mnt/shared/aamita/project/image_retrieval/VLM2Vec/runs/test/mmeb-qwen-test-data-all/checkpoint-50000/"
+            == model_name
+        ):
             base_model_name = "Qwen/Qwen2-VL-2B-Instruct"
             self.lora = False
-        else :
+        else:
             print("WTF")
             print(model_name)
             print(**kwargs)
             base_model_name = "Qwen/Qwen2-VL-2B-Instruct"
 
-        if self.lora :
+        if self.lora:
             config = AutoConfig.from_pretrained(base_model_name, trust_remote_code=True)
             config.use_cache = False
             # config.padding_side = "left"
 
             checkpoint_path = model_name if model_name else base_model_name
-            #pdb.set_trace()
+            # pdb.set_trace()
             base_model = Qwen2VLForConditionalGeneration.from_pretrained(
                 base_model_name,
                 config=config,
@@ -97,15 +113,15 @@ class Llama4Wrapper:
                 trust_remote_code=True,
             )
             # base_model.padding_side = "left"
-            #pdb.set_trace()
+            # pdb.set_trace()
             lora_config = LoraConfig.from_pretrained(model_name)
             lora_model = PeftModel.from_pretrained(
                 base_model, model_name, config=lora_config
             )
             merged_model = lora_model.merge_and_unload()
-            #pdb.set_trace()
+            # pdb.set_trace()
             model = merged_model.to(torch.bfloat16)  # propagate dtype.
-            #pdb.set_trace()
+            # pdb.set_trace()
             # # Building the model on top of the base
             # if "LoRA" in model_name or 1 :
             #     lora_config = LoraConfig.from_pretrained(model_name)
@@ -120,11 +136,13 @@ class Llama4Wrapper:
             tokenizer = Qwen2TokenizerFast.from_pretrained(base_model_name)
             self.processor = Qwen2VLProcessor.from_pretrained(
                 base_model_name,
-                image_processor=image_processor, tokenizer=tokenizer,
-                min_pixels=256 * 28 * 28, max_pixels=1280 * 28 * 28
+                image_processor=image_processor,
+                tokenizer=tokenizer,
+                min_pixels=256 * 28 * 28,
+                max_pixels=1280 * 28 * 28,
             )
 
-        else :
+        else:
             config = AutoConfig.from_pretrained(model_name, trust_remote_code=True)
             config.use_cache = False
             model = Qwen2VLForConditionalGeneration.from_pretrained(
@@ -138,15 +156,16 @@ class Llama4Wrapper:
             tokenizer = Qwen2TokenizerFast.from_pretrained(model_name)
             self.processor = Qwen2VLProcessor.from_pretrained(
                 base_model_name,
-                image_processor=image_processor, tokenizer=tokenizer,
-                min_pixels=256 * 28 * 28, max_pixels=1280 * 28 * 28
+                image_processor=image_processor,
+                tokenizer=tokenizer,
+                min_pixels=256 * 28 * 28,
+                max_pixels=1280 * 28 * 28,
             )
 
         model.eval()
         model.to(device)
         self.mdl = model
         # print(base_model_name)
-
 
         # self.processor = AutoProcessor.from_pretrained(
         #     base_model_name,
@@ -165,18 +184,20 @@ class Llama4Wrapper:
         return self.get_text_embeddings(texts=sentences)
 
     def encode_input(self, input):
-        try :
-            hidden_states = self.mdl(**input, return_dict=True, output_hidden_states=True)
-        except :
+        try:
+            hidden_states = self.mdl(
+                **input, return_dict=True, output_hidden_states=True
+            )
+        except:
             print(traceback.format_exc())
-            #pdb.set_trace()
+            # pdb.set_trace()
         hidden_states = hidden_states.hidden_states[-1]
         pooled_output = self._pooling(hidden_states, input["attention_mask"])
         return pooled_output
 
     def _pooling(self, last_hidden_state, attention_mask):
-        if self.pooling == 'last' or self.pooling == 'eos':
-            left_padding = (attention_mask[:, -1].sum() == attention_mask.shape[0])
+        if self.pooling == "last" or self.pooling == "eos":
+            left_padding = attention_mask[:, -1].sum() == attention_mask.shape[0]
             batch_size = last_hidden_state.shape[0]
             if left_padding:
                 # Get the vectors at the last position
@@ -186,7 +207,9 @@ class Llama4Wrapper:
                 eos_indices = attention_mask.sum(dim=1) - 1
                 # Get the vectors at the last 1 position of each attention mask
                 reps = last_hidden_state[
-                    torch.arange(batch_size, device=last_hidden_state.device), eos_indices]
+                    torch.arange(batch_size, device=last_hidden_state.device),
+                    eos_indices,
+                ]
         else:
             raise NotImplementedError
         if self.normalize:
@@ -226,33 +249,41 @@ class Llama4Wrapper:
                     input_ids, pixel_values, image_grid_thw = [], [], []
                     for b in batch:
                         inputs = self.processor(
-                            text = text,
-                            images = F.to_pil_image(b.to("cpu")),
+                            text=text,
+                            images=F.to_pil_image(b.to("cpu")),
                             return_tensors="pt",
                             # max_length=256,
                             truncation=True,
                         )
                         inputs = {k: v.to(self.device) for k, v in inputs.items()}
-                        input_ids.append(inputs["input_ids"].squeeze(0).unsqueeze(1)) # 1x256 -> 256x1
+                        input_ids.append(
+                            inputs["input_ids"].squeeze(0).unsqueeze(1)
+                        )  # 1x256 -> 256x1
                         pixel_values.append(inputs["pixel_values"].unsqueeze(0))
                         image_grid_thw.append(inputs["image_grid_thw"].unsqueeze(0))
-                    #pdb.set_trace()
+                    # pdb.set_trace()
                     input_ids = torch._C._nn.pad_sequence(
                         input_ids,
                         batch_first=True,
                         padding_value=self.processor.tokenizer.pad_token_id,
-                    ).squeeze(2) # 1x256
-                    attention_mask = input_ids.ne(self.processor.tokenizer.pad_token_id) # 1x256
-                    #pdb.set_trace()
-                    pixel_values = torch.cat(pixel_values, dim=0) # [ [19276, 1176] ] -> [19276, 1176]
-                    image_grid_thw = torch.cat(image_grid_thw, dim=0) #[ [1x3] ] -> [1x3]
+                    ).squeeze(2)  # 1x256
+                    attention_mask = input_ids.ne(
+                        self.processor.tokenizer.pad_token_id
+                    )  # 1x256
+                    # pdb.set_trace()
+                    pixel_values = torch.cat(
+                        pixel_values, dim=0
+                    )  # [ [19276, 1176] ] -> [19276, 1176]
+                    image_grid_thw = torch.cat(
+                        image_grid_thw, dim=0
+                    )  # [ [1x3] ] -> [1x3]
                     inputs = {
                         "input_ids": input_ids,
                         "attention_mask": attention_mask,
                         "pixel_values": pixel_values,
                         "image_grid_thw": image_grid_thw,
                     }
-                    #pdb.set_trace()
+                    # pdb.set_trace()
                     image_outputs = self.encode_input(inputs)
                     all_image_embeddings.append(image_outputs.cpu().to(torch.float32))
 
@@ -263,8 +294,8 @@ class Llama4Wrapper:
                     input_ids, pixel_values, image_grid_thw = [], [], []
                     for b in batch_images:
                         inputs = self.processor(
-                            text = [text],
-                            images = [b],
+                            text=[text],
+                            images=[b],
                             return_tensors="pt",
                             # max_length=256,
                             truncation=True,
@@ -290,10 +321,10 @@ class Llama4Wrapper:
                         "image_grid_thw": image_grid_thw,
                     }
                     try:
-                        #pdb.set_trace()
+                        # pdb.set_trace()
                         image_outputs = self.encode_input(inputs)
-                    except :
-                        #pdb.set_trace()
+                    except:
+                        # pdb.set_trace()
                         print("ERROR")
                     all_image_embeddings.append(image_outputs.cpu().to(torch.float32))
 
@@ -319,8 +350,8 @@ class Llama4Wrapper:
                 batch_texts = texts[i : i + batch_size]
                 for text in batch_texts:
                     inputs = self.processor(
-                        text = [text],
-                        images = None,
+                        text=[text],
+                        images=None,
                         return_tensors="pt",
                         # max_length=256,
                         truncation=True,
@@ -397,8 +428,8 @@ class Llama4Wrapper:
                         # pdb.set_trace()
                         text = next(texts)
                         inputs = self.processor(
-                            text = f"<|image_pad|> Represent the given image with the following question: {text}",
-                            images = [F.to_pil_image(b.to("cpu"))],
+                            text=f"<|image_pad|> Represent the given image with the following question: {text}",
+                            images=[F.to_pil_image(b.to("cpu"))],
                             return_tensors="pt",
                             # max_length=256,
                             truncation=True,
@@ -434,8 +465,10 @@ class Llama4Wrapper:
                     for b in batch_images:
                         text = next(texts)
                         inputs = self.processor(
-                            text = [f"<|image_pad|> Represent the given image with the following question: {text}"],
-                            images= [b],
+                            text=[
+                                f"<|image_pad|> Represent the given image with the following question: {text}"
+                            ],
+                            images=[b],
                             return_tensors="pt",
                             # max_length=256,
                             truncation=True,
