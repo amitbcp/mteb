@@ -139,7 +139,7 @@ class ModelMeta(BaseModel):
     @field_validator("name")
     @classmethod
     def check_name(cls, v: str | None) -> str | None:
-        if v is None or v in ["bm25s","llama4bm25" ,"gpt4obm25","gpt4ominibm25"]:
+        if v is None or v in ["bm25s","llama4bm25" ,"gpt4obm25","gpt4ominibm25","gpt41bm25","gpt41minibm25"]:
             return v
         if "/" not in v:
             raise ValueError(
