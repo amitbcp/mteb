@@ -145,7 +145,7 @@ model_modules = [
     ops_moa_models,
     piccolo_models,
     gme_v_models,
-    qwen25_model
+    qwen25_model,
     # qwen_25_vl_models,
     promptriever_models,
     qodo_models,

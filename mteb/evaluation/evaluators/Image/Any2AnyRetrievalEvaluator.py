@@ -319,7 +319,7 @@ class Any2AnyRetrievalEvaluator(Evaluator):
 
         if (
             hasattr(self.retriever.model, "mteb_model_meta")
-            and self.retriever.model.mteb_model_meta.name in ["llama4bm25","gpt4obm25","gpt4ominibm25","gpt41bm25","gpt41minibm25"]
+            and self.retriever.model.mteb_model_meta.name in ["llama4bm25","gpt4obm25","gpt4ominibm25","gpt41bm25","gpt41minibm25","qwen25_3b_bm25","qwen25_7b_bm25"]
         ):
             # pdb.set_trace()
             return self.retriever.model.search_image(

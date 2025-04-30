@@ -105,7 +105,7 @@ class Qwen25BM25Wrapper:
                 self.transform = get_default_transform()
 
             # We recommend enabling flash_attention_2 for better acceleration and memory saving, especially in multi-image and video scenarios.
-            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            self.ml_model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
                 model_path,
                 torch_dtype=torch.bfloat16,
                 attn_implementation="flash_attention_2",
@@ -409,7 +409,7 @@ class Qwen25BM25Wrapper:
         image_list = []
         if isinstance(images, DataLoader):
             with torch.no_grad():
-                for batch in images:
+                for batch in tqdm(images, desc="Processing images"):
                     for image_tensor in batch:
                         img_data_uri = tensor_to_base64(image_tensor)
                         model_response = self.get_model_inference(img_data_uri)
@@ -430,7 +430,7 @@ class Qwen25BM25Wrapper:
                 # all_image_texts.extend(["Sample text for image"]* len(batch))
         else:
             with torch.no_grad():
-                for i in range(0, len(images), batch_size):
+                for i in tqdm(range(0, len(images), batch_size),desc="Processing images"):
                     batch_images = images[i : i + batch_size]
                     for image_tensor in batch_images:
                         img_data_uri = tensor_to_base64(image_tensor,pil_image=False)
@@ -485,7 +485,7 @@ class Qwen25BM25Wrapper:
         image_list = []
         if isinstance(images, DataLoader):
             with torch.no_grad():
-                for batch in images:
+                for batch in tqdm(images, desc="Processing images"):
                     for image_tensor in batch:
                         img_data_uri = tensor_to_base64(image_tensor)
                         model_response = self.get_model_inference(img_data_uri)
@@ -506,7 +506,7 @@ class Qwen25BM25Wrapper:
                 # all_image_texts.extend(["Sample text for image"]* len(batch))
         else:
             with torch.no_grad():
-                for i in range(0, len(images), batch_size):
+                for i in tqdm(range(0, len(images), batch_size),desc="Processing images"):
                     batch_images = images[i : i + batch_size]
                     for image_tensor in batch_images:
                         img_data_uri = tensor_to_base64(image_tensor,pil_image=False)
@@ -562,7 +562,7 @@ class Qwen25BM25Wrapper:
         inputs = inputs.to("cuda")
 
         # Inference: Generation of the output
-        generated_ids = self.model.generate(**inputs, max_new_tokens=128)
+        generated_ids = self.ml_model.generate(**inputs, max_new_tokens=128)
         generated_ids_trimmed = [
             out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
         ]
