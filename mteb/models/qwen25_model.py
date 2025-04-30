@@ -22,6 +22,11 @@ from torch.utils.data import DataLoader
 import math
 import os
 
+from transformers import Qwen2_5_VLForConditionalGeneration, AutoTokenizer, AutoProcessor
+from qwen_vl_utils import process_vision_info
+import torch
+import io
+import base64
 from tqdm import tqdm
 from .oci_utils import *
 
@@ -82,19 +87,14 @@ class Qwen25BM25Wrapper:
     def __init__(
             self,
             model="qwen25bm25",
+            model_path: str = "Qwen/Qwen2.5-VL-7B-Instruct",
             previous_results: str = None,
             stopwords: str = "en",
             stemmer_language: str | None = "english",
             transform=None,
             **kwargs,
         ):
-            # super().__init__(
-            #     # model="qwen25bm25",
-            #     # batch_size=1,
-            #     # corpus_chunk_size=1,
-            #     # previous_results=previous_results,
-            #     # **kwargs,
-            # )
+
             self.model_name = model
             self.stopwords = stopwords
             self.stemmer = (
@@ -104,10 +104,21 @@ class Qwen25BM25Wrapper:
             if transform is None:
                 self.transform = get_default_transform()
 
+            # We recommend enabling flash_attention_2 for better acceleration and memory saving, especially in multi-image and video scenarios.
+            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+                model_path,
+                torch_dtype=torch.bfloat16,
+                attn_implementation="flash_attention_2",
+                device_map="auto",
+            )
+            # default processer
+            self.processor = AutoProcessor.from_pretrained(model_path)
 
-    @classmethod
-    def name(self):
-        return "qwen25bm25"
+
+
+    # @classmethod
+    # def name(self):
+    #     return "qwen25bm25"
 
     def search(
         self,
@@ -235,25 +246,6 @@ class Qwen25BM25Wrapper:
         logger.info(
             f"Scoring Function:)"# {self.score_function_desc[score_function]} ({score_function})"
         )
-        # for chunk_start in range(0, len(corpus), self.corpus_chunk_size):
-            # chunk = corpus.select(
-            #     range(
-            #         chunk_start, min(chunk_start + self.corpus_chunk_size, len(corpus))
-            #     )
-            # )
-            # chunk_ids = corpus_ids[chunk_start : chunk_start + self.corpus_chunk_size]
-
-        # corpus_with_ids = [
-        #         {
-        #             "doc_id": cid,
-        #             **(
-        #                 {"text": corpus[cid]}
-        #                 if isinstance(corpus[cid], str)
-        #                 else corpus[cid]
-        #             ),
-        #         }
-        #         for cid in corpus_ids
-        #     ]
 
         if corpus_modality == "text":
             # pdb.set_trace()
@@ -274,8 +266,8 @@ class Qwen25BM25Wrapper:
                 batch_size=encode_kwargs["batch_size"],
                 shuffle=False,
                 collate_fn=custom_collate_fn,
-                # num_workers=min(math.floor(os.cpu_count() / 2), 16),
-                num_workers=min(0, 16),
+                num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                # num_workers=min(0, 16),
             )
             # pdb.set_trace()
             if corpus_modality == "image":
@@ -324,8 +316,8 @@ class Qwen25BM25Wrapper:
                 batch_size=encode_kwargs["batch_size"],
                 shuffle=False,
                 collate_fn=custom_collate_fn,
-                # num_workers=min(math.floor(os.cpu_count() / 2), 16),
-                num_workers=min(0, 16),
+                num_workers=min(math.floor(os.cpu_count() / 2), 16),
+                # num_workers=min(0, 16),
             )
             if q_modality == "image":
                 query_embeddings = self.get_image_embeddings(
@@ -371,9 +363,6 @@ class Qwen25BM25Wrapper:
             self.results[qid] = doc_id_to_score
         # pdb.set_trace()
         return self.results
-
-
-
 
 
     def get_text_embeddings(
@@ -423,16 +412,18 @@ class Qwen25BM25Wrapper:
                 for batch in images:
                     for image_tensor in batch:
                         img_data_uri = tensor_to_base64(image_tensor)
-                        image_list.append(img_data_uri)
-                        if len(image_list) >= 10000:
-                            # pdb.set_trace()
-                            image_texts = run_parallel(image_list,max_threads=100)
-                            all_image_texts.extend(image_texts)
-                            image_list = []
-                # for the remaining images
-                if len(image_list) > 0:
-                    image_texts = run_parallel_progress(image_list,max_threads=100)
-                    all_image_texts.extend(image_texts)
+                        model_response = self.get_model_inference(img_data_uri)
+                        all_image_texts.append(model_response)
+                #         image_list.append(img_data_uri)
+                #         if len(image_list) >= 10000:
+                #             # pdb.set_trace()
+                #             image_texts = run_parallel(image_list,max_threads=100)
+                #             all_image_texts.extend(image_texts)
+                #             image_list = []
+                # # for the remaining images
+                # if len(image_list) > 0:
+                #     image_texts = run_parallel_progress(image_list,max_threads=100)
+                #     all_image_texts.extend(image_texts)
 
                 # pdb.set_trace()
                 # all_image_texts = run_parallel(image_list,max_threads=100)
@@ -443,16 +434,18 @@ class Qwen25BM25Wrapper:
                     batch_images = images[i : i + batch_size]
                     for image_tensor in batch_images:
                         img_data_uri = tensor_to_base64(image_tensor,pil_image=False)
-                        image_list.append(img_data_uri)
-                        if len(image_list) >= 10000:
-                            # pdb.set_trace()
-                            image_texts = run_parallel(image_list,max_threads=100)
-                            all_image_texts.extend(image_texts)
-                            image_list = []
+                        model_response = self.get_model_inference(img_data_uri)
+                        all_image_texts.append(model_response)
+                #         image_list.append(img_data_uri)
+                #         if len(image_list) >= 10000:
+                #             # pdb.set_trace()
+                #             image_texts = run_parallel(image_list,max_threads=100)
+                #             all_image_texts.extend(image_texts)
+                #             image_list = []
 
-                if len(image_list) > 0:
-                    image_texts = run_parallel_progress(image_list,max_threads=100)
-                    all_image_texts.extend(image_texts)
+                # if len(image_list) > 0:
+                #     image_texts = run_parallel_progress(image_list,max_threads=100)
+                #     all_image_texts.extend(image_texts)
                 # pdb.set_trace()
                 # all_image_texts = run_parallel(image_list,max_threads=100)
                 # all_image_texts.extend(["Sample text for image"]* len(batch_images))
@@ -495,16 +488,18 @@ class Qwen25BM25Wrapper:
                 for batch in images:
                     for image_tensor in batch:
                         img_data_uri = tensor_to_base64(image_tensor)
-                        image_list.append(img_data_uri)
-                        if len(image_list) >= 10000:
-                            # pdb.set_trace()
-                            image_texts = run_parallel(image_list,max_threads=100)
-                            all_image_texts.extend(image_texts)
-                            image_list = []
+                        model_response = self.get_model_inference(img_data_uri)
+                        all_image_texts.append(model_response)
+                #         image_list.append(img_data_uri)
+                #         if len(image_list) >= 10000:
+                #             # pdb.set_trace()
+                #             image_texts = run_parallel(image_list,max_threads=100)
+                #             all_image_texts.extend(image_texts)
+                #             image_list = []
 
-                if len(image_list) > 0:
-                    image_texts = run_parallel_progress(image_list,max_threads=100)
-                    all_image_texts.extend(image_texts)
+                # if len(image_list) > 0:
+                #     image_texts = run_parallel_progress(image_list,max_threads=100)
+                #     all_image_texts.extend(image_texts)
 
 
                 # all_image_texts = run_parallel(image_list,max_threads=100)
@@ -515,16 +510,19 @@ class Qwen25BM25Wrapper:
                     batch_images = images[i : i + batch_size]
                     for image_tensor in batch_images:
                         img_data_uri = tensor_to_base64(image_tensor,pil_image=False)
-                        image_list.append(img_data_uri)
-                        if len(image_list) >= 10000:
-                            # pdb.set_trace()
-                            image_texts = run_parallel(image_list,max_threads=100)
-                            all_image_texts.extend(image_texts)
-                            image_list = []
+                        model_response = self.get_model_inference(img_data_uri)
+                        all_image_texts.append(model_response)
 
-                if len(image_list) > 0:
-                    image_texts = run_parallel_progress(image_list,max_threads=100)
-                    all_image_texts.extend(image_texts)
+                #         image_list.append(img_data_uri)
+                #         if len(image_list) >= 10000:
+                #             # pdb.set_trace()
+                #             image_texts = run_parallel(image_list,max_threads=100)
+                #             all_image_texts.extend(image_texts)
+                #             image_list = []
+
+                # if len(image_list) > 0:
+                #     image_texts = run_parallel_progress(image_list,max_threads=100)
+                #     all_image_texts.extend(image_texts)
 
                 # all_image_texts = run_parallel(image_list,max_threads=100)
 
@@ -533,6 +531,46 @@ class Qwen25BM25Wrapper:
         # pdb.set_trace()
         return bm25s.tokenize(fused_text, stopwords=self.stopwords, stemmer=self.stemmer)
 
+    def get_model_inference(self,img_data_uri):
+
+        messages = [
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "image",
+                                    # "image": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg",
+                                    "image":img_data_uri,
+                                },
+                                {"type": "text", "text": "Describe this image."},
+                            ],
+                        }
+                    ]
+        # Preparation for inference
+        text = self.processor.apply_chat_template(
+            messages, tokenize=False, add_generation_prompt=True
+        )
+
+        image_inputs, video_inputs = process_vision_info(messages)
+        inputs = self.processor(
+            text=[text],
+            images=image_inputs,
+            videos=video_inputs,
+            padding=True,
+            return_tensors="pt",
+        )
+        inputs = inputs.to("cuda")
+
+        # Inference: Generation of the output
+        generated_ids = self.model.generate(**inputs, max_new_tokens=128)
+        generated_ids_trimmed = [
+            out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
+        ]
+        output_text = self.processor.batch_decode(
+            generated_ids_trimmed, skip_special_tokens=True, clean_up_tokenization_spaces=False
+        )
+
+        return output_text[0]
 
 
 
@@ -540,12 +578,39 @@ class Qwen25BM25Wrapper:
 
 
 
-qwen25_bm25 = ModelMeta(
+qwen25_3b_bm25 = ModelMeta(
     loader=partial(
         Qwen25BM25Wrapper,
-        model_name="qwen25bm25",
+        model_name="qwen25_3b_bm25",
+        model_path="Qwen/Qwen2.5-VL-3B-Instruct",
     ),
-    name="qwen25bm25",
+    name="qwen25_3b_bm25",
+    languages=["eng-Latn"],
+    revision="0_1_10",
+    release_date="2024-10-08",
+    modalities=["image", "text"],
+    n_parameters=None,
+    memory_usage_mb=None,
+    max_tokens=131072,
+    embed_dim=5120,
+    license="apache-2.0",
+    open_weights=True,
+    public_training_code="",
+    public_training_data="https://github.com/xhluca/bm25s",
+    framework=["PyTorch"],
+    reference="https://github.com/xhluca/bm25s",
+    similarity_fn_name=None,
+    use_instructions=True,
+    training_datasets=None,
+)
+
+qwen25_7b_bm25 = ModelMeta(
+    loader=partial(
+        Qwen25BM25Wrapper,
+        model_name="qwen25_7b_bm25",
+        model_path="Qwen/Qwen2.5-VL-7B-Instruct",
+    ),
+    name="qwen25_7b_bm25",
     languages=["eng-Latn"],
     revision="0_1_10",
     release_date="2024-10-08",
