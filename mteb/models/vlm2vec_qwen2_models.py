@@ -551,7 +551,10 @@ vlm2vec_qwen2_8k_alldata_full = ModelMeta(
     training_datasets=vlm2vec_training_datasets,
 )
 
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 vlm2vec_qwen2_8k_alldata_lora_single_core = ModelMeta(
     loader=partial(
         VLM2VecQwen2Wrapper,
