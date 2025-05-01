@@ -42,8 +42,10 @@ dependencies = [
     "polars>=0.20.22",
     "bm25s>=0.0.0",
     "PyStemmer>=0.0.0",
-    "oci>=0.0.0",
-    "torchvision>=0.0.0"
+    "oci>=0.0.0",    
+    "torchvision>=0.0.0",
+    "qwen-vl-utils>=0.0.0",
+    "accelerate>=0.0.0"
 ]
 
 
