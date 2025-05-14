@@ -9,7 +9,7 @@ from mteb.requires_package import (
     suggest_package,
 )
 from functools import partial
-from typing import Any, Literal
+from typing import Any, Literal, Optional
 from PIL import Image
 import bm25s
 import Stemmer
@@ -433,7 +433,7 @@ class Qwen25BM25Wrapper:
                 for i in tqdm(range(0, len(images), batch_size),desc="Processing images"):
                     batch_images = images[i : i + batch_size]
                     for image_tensor in batch_images:
-                        img_data_uri = tensor_to_base64(image_tensor,pil_image=False)
+                        img_data_uri = tensor_to_base64(image_tensor, pil_image=False)
                         model_response = self.get_model_inference(img_data_uri)
                         all_image_texts.append(model_response)
                 #         image_list.append(img_data_uri)
@@ -531,7 +531,11 @@ class Qwen25BM25Wrapper:
         # pdb.set_trace()
         return bm25s.tokenize(fused_text, stopwords=self.stopwords, stemmer=self.stemmer)
 
-    def get_model_inference(self,img_data_uri):
+    def get_model_inference(self,
+                            img_data_uri, 
+                            prompt_text: Optional[str] = None):
+        if not prompt_text:
+            prompt_text = "Describe this image."
 
         messages = [
                         {
@@ -540,9 +544,11 @@ class Qwen25BM25Wrapper:
                                 {
                                     "type": "image",
                                     # "image": "https://qianwen-res.oss-cn-beijing.aliyuncs.com/Qwen-VL/assets/demo.jpeg",
-                                    "image":img_data_uri,
+                                    "image": img_data_uri,
                                 },
-                                {"type": "text", "text": "Describe this image."},
+                                {
+                                    "type": "text", 
+                                    "text": prompt_text},
                             ],
                         }
                     ]

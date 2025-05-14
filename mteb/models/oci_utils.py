@@ -345,7 +345,7 @@ def run_parallel_progress(image_list: List[str], max_threads=20,model="llama4-17
     return results
 
 
-def tensor_to_base64(image_tensor,pil_image=False):
+def tensor_to_base64(image_tensor, pil_image=False):
     # Convert to PIL image
     if not pil_image:
         pil_image = to_pil_image(image_tensor)
