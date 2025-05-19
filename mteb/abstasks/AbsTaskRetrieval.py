@@ -142,8 +142,9 @@ class HFDataLoader:
                 keep_in_memory=self.keep_in_memory,
             )
         corpus_ds = next(iter(corpus_ds.values()))  # get first split
-        corpus_ds = corpus_ds.cast_column("_id", Value("string"))
-        corpus_ds = corpus_ds.rename_column("_id", "id")
+        if "id_" in corpus_ds.features:
+            corpus_ds = corpus_ds.cast_column("_id", Value("string"))
+            corpus_ds = corpus_ds.rename_column("_id", "id")
         corpus_ds = corpus_ds.remove_columns(
             [
                 col
