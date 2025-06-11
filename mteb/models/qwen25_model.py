@@ -105,7 +105,7 @@ class Qwen25BM25Wrapper:
                 self.transform = get_default_transform()
 
             # We recommend enabling flash_attention_2 for better acceleration and memory saving, especially in multi-image and video scenarios.
-            self.model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
+            self.ml_model = Qwen2_5_VLForConditionalGeneration.from_pretrained(
                 model_path,
                 torch_dtype=torch.bfloat16,
                 attn_implementation="flash_attention_2",
@@ -288,7 +288,7 @@ class Qwen25BM25Wrapper:
                 )
             else:
                 raise ValueError(f"Unsupported modality: {corpus_modality}")
-
+        pdb.set_trace()
         self.model.index(sub_corpus_embeddings)
 
 
@@ -532,7 +532,7 @@ class Qwen25BM25Wrapper:
         return bm25s.tokenize(fused_text, stopwords=self.stopwords, stemmer=self.stemmer)
 
     def get_model_inference(self,img_data_uri):
-
+        return "Amit Kumar" #text
         messages = [
                         {
                             "role": "user",
@@ -562,7 +562,7 @@ class Qwen25BM25Wrapper:
         inputs = inputs.to("cuda")
 
         # Inference: Generation of the output
-        generated_ids = self.model.generate(**inputs, max_new_tokens=128)
+        generated_ids = self.ml_model.generate(**inputs, max_new_tokens=128)
         generated_ids_trimmed = [
             out_ids[len(in_ids) :] for in_ids, out_ids in zip(inputs.input_ids, generated_ids)
         ]

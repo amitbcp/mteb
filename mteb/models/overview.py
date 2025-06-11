@@ -86,10 +86,10 @@ from mteb.models import (
     uae_models,
     vdr_models,
     vista_models,
-    vlm2vec_models,vlm2vec_qwen2_models,
+    vlm2vec_models,
+    vlm2vec_qwen2_models,
     voyage_models,
     voyage_v,
-
 )
 
 logger = logging.getLogger(__name__)
@@ -145,7 +145,7 @@ model_modules = [
     ops_moa_models,
     piccolo_models,
     gme_v_models,
-    qwen25_model
+    qwen25_model,
     # qwen_25_vl_models,
     promptriever_models,
     qodo_models,
