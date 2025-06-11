@@ -32,14 +32,16 @@ class GermanDPR(AbsTaskRetrieval):
         annotations_creators="human-annotated",
         dialect=[],
         sample_creation="found",
-        bibtex_citation="""@misc{möller2021germanquad,
-      title={GermanQuAD and GermanDPR: Improving Non-English Question Answering and Passage Retrieval},
-      author={Timo Möller and Julian Risch and Malte Pietsch},
-      year={2021},
-      eprint={2104.12741},
-      archivePrefix={arXiv},
-      primaryClass={cs.CL}
-}""",
+        bibtex_citation=r"""
+@misc{möller2021germanquad,
+  archiveprefix = {arXiv},
+  author = {Timo Möller and Julian Risch and Malte Pietsch},
+  eprint = {2104.12741},
+  primaryclass = {cs.CL},
+  title = {GermanQuAD and GermanDPR: Improving Non-English Question Answering and Passage Retrieval},
+  year = {2021},
+}
+""",
     )
 
     @staticmethod
@@ -82,7 +84,7 @@ class GermanDPR(AbsTaskRetrieval):
                 existing_docs=all_docs,
             )
             corpus.update(neg_docs)
-            relevant_docs[q_id] = {k: 1 for k in pos_docs}
+            relevant_docs[q_id] = dict.fromkeys(pos_docs, 1)
         corpus = {
             key: doc.get("title", "") + " " + doc["text"] for key, doc in corpus.items()
         }
