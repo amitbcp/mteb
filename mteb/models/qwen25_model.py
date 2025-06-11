@@ -409,7 +409,7 @@ class Qwen25BM25Wrapper:
         image_list = []
         if isinstance(images, DataLoader):
             with torch.no_grad():
-                for batch in images:
+                for batch in tqdm(images, desc="Processing images"):
                     for image_tensor in batch:
                         img_data_uri = tensor_to_base64(image_tensor)
                         model_response = self.get_model_inference(img_data_uri)
@@ -430,7 +430,7 @@ class Qwen25BM25Wrapper:
                 # all_image_texts.extend(["Sample text for image"]* len(batch))
         else:
             with torch.no_grad():
-                for i in range(0, len(images), batch_size):
+                for i in tqdm(range(0, len(images), batch_size),desc="Processing images"):
                     batch_images = images[i : i + batch_size]
                     for image_tensor in batch_images:
                         img_data_uri = tensor_to_base64(image_tensor,pil_image=False)
@@ -485,7 +485,7 @@ class Qwen25BM25Wrapper:
         image_list = []
         if isinstance(images, DataLoader):
             with torch.no_grad():
-                for batch in images:
+                for batch in tqdm(images, desc="Processing images"):
                     for image_tensor in batch:
                         img_data_uri = tensor_to_base64(image_tensor)
                         model_response = self.get_model_inference(img_data_uri)
@@ -506,7 +506,7 @@ class Qwen25BM25Wrapper:
                 # all_image_texts.extend(["Sample text for image"]* len(batch))
         else:
             with torch.no_grad():
-                for i in range(0, len(images), batch_size):
+                for i in tqdm(range(0, len(images), batch_size),desc="Processing images"):
                     batch_images = images[i : i + batch_size]
                     for image_tensor in batch_images:
                         img_data_uri = tensor_to_base64(image_tensor,pil_image=False)
