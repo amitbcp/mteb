@@ -33,7 +33,7 @@ model_names = [
 "llama4bm25",
 "gpt4obm25",
 "gpt4ominibm25"
-    
+
 ]
 
 
@@ -52,7 +52,7 @@ for model_res in mteb_results:
         if not task_result.task_name in task_names :
             continue
         tasks = mteb.get_tasks(tasks=[task_result.task_name])
-        
+
         # print(task_result)
         data.append(
                 {
