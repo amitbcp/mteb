@@ -86,10 +86,10 @@ from mteb.models import (
     uae_models,
     vdr_models,
     vista_models,
-    vlm2vec_models,vlm2vec_qwen2_models,
+    vlm2vec_models,
+    vlm2vec_qwen2_models,
     voyage_models,
     voyage_v,
-
 )
 
 logger = logging.getLogger(__name__)

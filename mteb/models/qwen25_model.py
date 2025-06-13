@@ -288,7 +288,7 @@ class Qwen25BM25Wrapper:
                 )
             else:
                 raise ValueError(f"Unsupported modality: {corpus_modality}")
-
+        pdb.set_trace()
         self.model.index(sub_corpus_embeddings)
 
 
@@ -532,7 +532,7 @@ class Qwen25BM25Wrapper:
         return bm25s.tokenize(fused_text, stopwords=self.stopwords, stemmer=self.stemmer)
 
     def get_model_inference(self,img_data_uri):
-
+        return "Amit Kumar" #text
         messages = [
                         {
                             "role": "user",

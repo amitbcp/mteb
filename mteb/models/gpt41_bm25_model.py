@@ -27,27 +27,29 @@ logger = logging.getLogger(__name__)
 EncodeTypes = Literal["query", "passage"]
 from torchvision.transforms import InterpolationMode
 
-class ResizeIfLarger:
-        def __init__(self, max_size):
-            self.max_height, self.max_width = max_size
 
-        def __call__(self, img: Image.Image):
-            if img.height > self.max_height or img.width > self.max_width:
-                # Resize while maintaining aspect ratio
-                img.thumbnail((self.max_width, self.max_height), Image.ANTIALIAS)
-            return img
+class ResizeIfLarger:
+    def __init__(self, max_size):
+        self.max_height, self.max_width = max_size
+
+    def __call__(self, img: Image.Image):
+        if img.height > self.max_height or img.width > self.max_width:
+            # Resize while maintaining aspect ratio
+            img.thumbnail((self.max_width, self.max_height), Image.ANTIALIAS)
+        return img
+
 
 def get_default_transform(max_size=(1024, 1024)):
     requires_image_dependencies()
     from torchvision import transforms
 
-
-    return transforms.Compose([
-        transforms.Resize(max_size, interpolation=InterpolationMode.BILINEAR),
-        transforms.PILToTensor(),
-    ])
+    return transforms.Compose(
+        [
+            transforms.Resize(max_size, interpolation=InterpolationMode.BILINEAR),
+            transforms.PILToTensor(),
+        ]
+    )
     # return transforms.Compose([transforms.PILToTensor()])
-
 
 
 class ImageDataset(torch.utils.data.Dataset):
@@ -72,35 +74,34 @@ class ImageDataset(torch.utils.data.Dataset):
             image = self.transform(image)
         return image
 
+
 def custom_collate_fn(batch):
     return batch
 
+
 class GPT41BM25Wrapper:
     def __init__(
-            self,
-            model="gpt41bm25",
-            previous_results: str = None,
-            stopwords: str = "en",
-            stemmer_language: str | None = "english",
-            transform=None,
-            **kwargs,
-        ):
-            # super().__init__(
-            #     # model="llama4bm25",
-            #     # batch_size=1,
-            #     # corpus_chunk_size=1,
-            #     # previous_results=previous_results,
-            #     # **kwargs,
-            # )
-            self.model_name = model
-            self.stopwords = stopwords
-            self.stemmer = (
-                Stemmer.Stemmer(stemmer_language) if stemmer_language else None
-            )
-            self.model =  bm25s.BM25()
-            if transform is None:
-                self.transform = get_default_transform()
-
+        self,
+        model="gpt41bm25",
+        previous_results: str = None,
+        stopwords: str = "en",
+        stemmer_language: str | None = "english",
+        transform=None,
+        **kwargs,
+    ):
+        # super().__init__(
+        #     # model="llama4bm25",
+        #     # batch_size=1,
+        #     # corpus_chunk_size=1,
+        #     # previous_results=previous_results,
+        #     # **kwargs,
+        # )
+        self.model_name = model
+        self.stopwords = stopwords
+        self.stemmer = Stemmer.Stemmer(stemmer_language) if stemmer_language else None
+        self.model = bm25s.BM25()
+        if transform is None:
+            self.transform = get_default_transform()
 
     @classmethod
     def name(self):
@@ -110,7 +111,6 @@ class GPT41BM25Wrapper:
         self,
         corpus: dict[str, dict[str, str | Image.Image]],
         queries: dict[str, dict[str, str | Image.Image]],
-
         top_k: int,
         score_function: str,
         return_sorted: bool = False,
@@ -132,8 +132,7 @@ class GPT41BM25Wrapper:
         ]
 
         corpus_texts = [
-            "\n".join([doc.get("title", ""), doc["text"]])
-            for doc in corpus_with_ids
+            "\n".join([doc.get("title", ""), doc["text"]]) for doc in corpus_with_ids
         ]  # concatenate all document values (title, text, ...)
         encoded_corpus = self.encode(corpus_texts)
         pdb.set_trace()
@@ -185,7 +184,7 @@ class GPT41BM25Wrapper:
         task_name: str | None = None,
         prompt_type: PromptType | None = None,
         **kwargs: Any,
-        ):
+    ):
         """Encode a list of sentences using the model.
         Args:
             sentences: The list of sentences to encode.
@@ -203,7 +202,6 @@ class GPT41BM25Wrapper:
         # pdb.set_trace()
         return bm25s.tokenize(sentences, stopwords=self.stopwords, stemmer=self.stemmer)
 
-
     def search_image(
         self,
         corpus: Dataset,  # solve memoery issues
@@ -214,9 +212,7 @@ class GPT41BM25Wrapper:
         task_name: str,
         return_sorted: bool = False,
         **kwargs,
-        ) -> dict[str, dict[str, float]]:
-
-
+    ) -> dict[str, dict[str, float]]:
         # if score_function not in self.score_functions:
         #     raise ValueError(
         #         f"score function: {score_function} must be either (cos_sim) for cosine similarity or (dot) for dot product"
@@ -230,15 +226,15 @@ class GPT41BM25Wrapper:
         corpus_modality = corpus[0]["modality"]
         logger.info("Encoding Corpus in batches... Warning: This might take a while!")
         logger.info(
-            f"Scoring Function:)"# {self.score_function_desc[score_function]} ({score_function})"
+            f"Scoring Function:)"  # {self.score_function_desc[score_function]} ({score_function})"
         )
         # for chunk_start in range(0, len(corpus), self.corpus_chunk_size):
-            # chunk = corpus.select(
-            #     range(
-            #         chunk_start, min(chunk_start + self.corpus_chunk_size, len(corpus))
-            #     )
-            # )
-            # chunk_ids = corpus_ids[chunk_start : chunk_start + self.corpus_chunk_size]
+        # chunk = corpus.select(
+        #     range(
+        #         chunk_start, min(chunk_start + self.corpus_chunk_size, len(corpus))
+        #     )
+        # )
+        # chunk_ids = corpus_ids[chunk_start : chunk_start + self.corpus_chunk_size]
 
         # corpus_with_ids = [
         #         {
@@ -296,7 +292,6 @@ class GPT41BM25Wrapper:
 
         self.model.index(sub_corpus_embeddings)
 
-
         logger.info("Encoding Queries...")
         query_ids = list(queries["id"])
         self.results = {qid: {} for qid in query_ids}
@@ -345,9 +340,10 @@ class GPT41BM25Wrapper:
         # pdb.set_trace()
         logger.info(f"Retrieving Results... {len(queries):,} queries")
         queries_results, queries_scores = self.model.retrieve(
-                # query_embeddings, corpus=corpus_with_ids, k=top_k
-                query_embeddings,  k=top_k
-            )
+            # query_embeddings, corpus=corpus_with_ids, k=top_k
+            query_embeddings,
+            k=top_k,
+        )
         # pdb.set_trace()
         # Iterate over queries
         for qi, qid in enumerate(query_ids):
@@ -361,17 +357,13 @@ class GPT41BM25Wrapper:
                 doc = query_results[ri]
                 score = scores[ri]
                 # pdb.set_trace()
-                doc_id = corpus_ids[doc] #doc["doc_id"]
+                doc_id = corpus_ids[doc]  # doc["doc_id"]
 
                 doc_id_to_score[doc_id] = float(score)
 
             self.results[qid] = doc_id_to_score
         # pdb.set_trace()
         return self.results
-
-
-
-
 
     def get_text_embeddings(
         self,
@@ -403,7 +395,7 @@ class GPT41BM25Wrapper:
         prompt_type: PromptType | None = None,
         batch_size: int = 32,
         **kwargs: Any,
-        ):
+    ):
         """Get image embeddings for a list of images using the model.
         Args:
             images: The list of images to encode.
@@ -423,38 +415,48 @@ class GPT41BM25Wrapper:
                         image_list.append(img_data_uri)
                         if len(image_list) >= 10000:
                             # pdb.set_trace()
-                            image_texts = run_parallel(image_list,max_threads=15,model="gpt41")
+                            image_texts = run_parallel(
+                                image_list, max_threads=5, model="gpt41"
+                            )
                             all_image_texts.extend(image_texts)
                             image_list = []
                 # for the remaining images
                 if len(image_list) > 0:
-                    image_texts = run_parallel_progress(image_list,max_threads=15,model="gpt41")
+                    image_texts = run_parallel_progress(
+                        image_list, max_threads=5, model="gpt41"
+                    )
                     all_image_texts.extend(image_texts)
 
                 # pdb.set_trace()
-                # all_image_texts = run_parallel(image_list,max_threads=15)
+                # all_image_texts = run_parallel(image_list,max_threads=5)
                 # all_image_texts.extend(["Sample text for image"]* len(batch))
         else:
             with torch.no_grad():
                 for i in range(0, len(images), batch_size):
                     batch_images = images[i : i + batch_size]
                     for image_tensor in batch_images:
-                        img_data_uri = tensor_to_base64(image_tensor,pil_image=False)
+                        img_data_uri = tensor_to_base64(image_tensor, pil_image=False)
                         image_list.append(img_data_uri)
                         if len(image_list) >= 10000:
                             # pdb.set_trace()
-                            image_texts = run_parallel(image_list,max_threads=15,model="gpt41")
+                            image_texts = run_parallel(
+                                image_list, max_threads=5, model="gpt41"
+                            )
                             all_image_texts.extend(image_texts)
                             image_list = []
 
                 if len(image_list) > 0:
-                    image_texts = run_parallel_progress(image_list,max_threads=15,model="gpt41")
+                    image_texts = run_parallel_progress(
+                        image_list, max_threads=5, model="gpt41"
+                    )
                     all_image_texts.extend(image_texts)
                 # pdb.set_trace()
-                # all_image_texts = run_parallel(image_list,max_threads=15)
+                # all_image_texts = run_parallel(image_list,max_threads=5)
                 # all_image_texts.extend(["Sample text for image"]* len(batch_images))
         # pdb.set_trace()
-        return bm25s.tokenize(all_image_texts, stopwords=self.stopwords, stemmer=self.stemmer)
+        return bm25s.tokenize(
+            all_image_texts, stopwords=self.stopwords, stemmer=self.stemmer
+        )
 
         # return self.encode(
         #     images, task_name=task_name, prompt_type=prompt_type, **kwargs
@@ -462,8 +464,8 @@ class GPT41BM25Wrapper:
 
     def get_fused_embeddings(
         self,
-        texts: list[str]  | None = None,
-        images: list[Image.Image]| DataLoader | None = None,
+        texts: list[str] | None = None,
+        images: list[Image.Image] | DataLoader | None = None,
         *,
         task_name: str | None = None,
         prompt_type: PromptType | None = None,
@@ -495,46 +497,48 @@ class GPT41BM25Wrapper:
                         image_list.append(img_data_uri)
                         if len(image_list) >= 10000:
                             # pdb.set_trace()
-                            image_texts = run_parallel(image_list,max_threads=15,model="gpt41")
+                            image_texts = run_parallel(
+                                image_list, max_threads=5, model="gpt41"
+                            )
                             all_image_texts.extend(image_texts)
                             image_list = []
 
                 if len(image_list) > 0:
-                    image_texts = run_parallel_progress(image_list,max_threads=15,model="gpt41")
+                    image_texts = run_parallel_progress(
+                        image_list, max_threads=5, model="gpt41"
+                    )
                     all_image_texts.extend(image_texts)
 
-
-                # all_image_texts = run_parallel(image_list,max_threads=15)
+                # all_image_texts = run_parallel(image_list,max_threads=5)
                 # all_image_texts.extend(["Sample text for image"]* len(batch))
         else:
             with torch.no_grad():
                 for i in range(0, len(images), batch_size):
                     batch_images = images[i : i + batch_size]
                     for image_tensor in batch_images:
-                        img_data_uri = tensor_to_base64(image_tensor,pil_image=False)
+                        img_data_uri = tensor_to_base64(image_tensor, pil_image=False)
                         image_list.append(img_data_uri)
                         if len(image_list) >= 10000:
                             # pdb.set_trace()
-                            image_texts = run_parallel(image_list,max_threads=15,model="gpt41")
+                            image_texts = run_parallel(
+                                image_list, max_threads=5, model="gpt41"
+                            )
                             all_image_texts.extend(image_texts)
                             image_list = []
 
                 if len(image_list) > 0:
-                    image_texts = run_parallel_progress(image_list,max_threads=15,model="gpt41")
+                    image_texts = run_parallel_progress(
+                        image_list, max_threads=5, model="gpt41"
+                    )
                     all_image_texts.extend(image_texts)
 
-                # all_image_texts = run_parallel(image_list,max_threads=15)
-
+                # all_image_texts = run_parallel(image_list,max_threads=5)
 
         fused_text = [f"{t}. {i}" for t, i in zip(texts, all_image_texts)]
         # pdb.set_trace()
-        return bm25s.tokenize(fused_text, stopwords=self.stopwords, stemmer=self.stemmer)
-
-
-
-
-
-
+        return bm25s.tokenize(
+            fused_text, stopwords=self.stopwords, stemmer=self.stemmer
+        )
 
 
 gpt41_bm25 = ModelMeta(
