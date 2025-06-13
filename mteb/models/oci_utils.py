@@ -260,7 +260,7 @@ def get_inference_ocigenai(infer_image_url, model_id):
 
     content1 = oci.generative_ai_inference.models.TextContent()
     content1.text = """Carefully observe and analyse the image. Then extract the following from the image -
-(1) All the text in the image. If their is no text in the image, then skip this point and don't mention it. \n
+(1) All the text in the image. If there is no text in the image, then skip this point and don't mention it. \n
 (2) Description of the image in detail"""
     content2 = oci.generative_ai_inference.models.ImageContent()
     image_url = oci.generative_ai_inference.models.ImageUrl()
