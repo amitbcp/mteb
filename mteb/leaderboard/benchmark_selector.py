@@ -6,6 +6,19 @@ import gradio as gr
 
 import mteb
 from mteb import Benchmark
+from mteb.benchmarks.benchmarks import MTEB_multilingual_v2
+from mteb.benchmarks.benchmarks.rteb_benchmarks import (
+    RTEB_CODE,
+    RTEB_ENGLISH,
+    RTEB_FINANCE,
+    RTEB_FRENCH,
+    RTEB_GERMAN,
+    RTEB_HEALTHCARE,
+    RTEB_LEGAL,
+    RTEB_MAIN,
+)
+
+DEFAULT_BENCHMARK_NAME = MTEB_multilingual_v2.name
 
 
 @dataclass
@@ -32,6 +45,7 @@ BENCHMARK_ENTRIES = [
                         "MIEB(lite)",
                         "MIEB(Img)",
                         "VisualDocumentRetrieval",
+                        "JinaVDR",
                     ]
                 ),
             ),
@@ -61,6 +75,7 @@ BENCHMARK_ENTRIES = [
                         "MTEB(pol, v1)",
                         "MTEB(rus, v1)",
                         "MTEB(fas, v1)",
+                        "VN-MTEB (vie, v1)",
                     ]
                 )
                 + [MenuEntry("Other", mteb.get_benchmarks(["MTEB(eng, v1)"]))],
@@ -85,6 +100,29 @@ BENCHMARK_ENTRIES = [
             ),
         ],
     ),
+]
+
+RTEB_BENCHMARK_ENTRIES = [
+    MenuEntry(
+        name="RTEB (Retrieval)",
+        description=None,
+        open=False,
+        benchmarks=[
+            RTEB_MAIN,
+            MenuEntry(
+                "Domain-Specific",
+                description=None,
+                open=False,
+                benchmarks=[RTEB_FINANCE, RTEB_LEGAL, RTEB_CODE, RTEB_HEALTHCARE],
+            ),
+            MenuEntry(
+                "Language-specific",
+                description=None,
+                open=False,
+                benchmarks=[RTEB_ENGLISH, RTEB_FRENCH, RTEB_GERMAN],
+            ),
+        ],
+    )
 ]
 
 
@@ -136,7 +174,7 @@ def make_selector(entries: list[MenuEntry]) -> tuple[gr.State, gr.Column]:
     button_counter = 0
 
     with gr.Column() as column:
-        state = gr.State("selector_state")
+        state = gr.State(DEFAULT_BENCHMARK_NAME)
 
         for category_entry in entries:
             button_counter = _render_category(
@@ -188,5 +226,4 @@ def _render_benchmark_item(
 if __name__ == "__main__":
     with gr.Blocks() as b:
         selector = make_selector(BENCHMARK_ENTRIES)
-
     b.launch()
