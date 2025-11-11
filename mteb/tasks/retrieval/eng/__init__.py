@@ -74,7 +74,11 @@ from .feedback_qa_retrieval import FeedbackQARetrieval
 from .fever_retrieval import FEVER, FEVERHardNegatives, FEVERHardNegativesV2
 from .fi_qa2018_retrieval import FiQA2018
 from .fin_qa_retrieval import FinQARetrieval
+from .finqa_no_numbers_retrieval import FinQANoNumbersRetrieval
+from .finqa_num_token_retrieval import FinQANumTokenRetrieval
 from .finance_bench_retrieval import FinanceBenchRetrieval
+from .finance_bench_no_numbers_retrieval import FinanceBenchNoNumbersRetrieval
+from .finance_bench_num_token_retrieval import FinanceBenchNumTokenRetrieval
 from .flickr30k_i2t_retrieval import Flickr30kI2TRetrieval
 from .flickr30k_t2i_retrieval import Flickr30kT2IRetrieval
 from .forb_i2i_retrieval import FORBI2I
@@ -200,6 +204,12 @@ from .vidore_bench_retrieval import (
     VidoreTabfquadRetrieval,
     VidoreTatdqaRetrieval,
 )
+from .vidore_tabular_text_retrieval import (
+    VidoreTabfquadTextNoNumbersRetrieval,
+    VidoreTabfquadTextNumTokenRetrieval,
+    VidoreTatdqaTextNoNumbersRetrieval,
+    VidoreTatdqaTextNumTokenRetrieval,
+)
 from .visual_news_i2t_retrieval import VisualNewsI2TRetrieval
 from .visual_news_t2i_retrieval import VisualNewsT2IRetrieval
 from .viz_wiz_it2t_retrieval import VizWizIT2TRetrieval
@@ -294,7 +304,11 @@ __all__ = [
     "FashionIQIT2IRetrieval",
     "FeedbackQARetrieval",
     "FiQA2018",
+    "FinQANoNumbersRetrieval",
+    "FinQANumTokenRetrieval",
     "FinQARetrieval",
+    "FinanceBenchNoNumbersRetrieval",
+    "FinanceBenchNumTokenRetrieval",
     "FinanceBenchRetrieval",
     "Flickr30kI2TRetrieval",
     "Flickr30kT2IRetrieval",
@@ -407,6 +421,10 @@ __all__ = [
     "VidoreSyntheticDocQAHealthcareIndustryRetrieval",
     "VidoreTabfquadRetrieval",
     "VidoreTatdqaRetrieval",
+    "VidoreTabfquadTextNoNumbersRetrieval",
+    "VidoreTabfquadTextNumTokenRetrieval",
+    "VidoreTatdqaTextNoNumbersRetrieval",
+    "VidoreTatdqaTextNumTokenRetrieval",
     "VisualNewsI2TRetrieval",
     "VisualNewsT2IRetrieval",
     "VizWizIT2TRetrieval",
