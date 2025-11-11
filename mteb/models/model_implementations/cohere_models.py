@@ -164,10 +164,11 @@ def retry_with_rate_limit(
     def decorator(func):
         @wraps(func)
         def wrapper(self, *args, **kwargs):
-            import cohere
-
             nonlocal previous_call_ts
-
+            try:
+                import cohere  # type: ignore
+            except ModuleNotFoundError:
+                cohere = None  # type: ignore
             request_interval = 60.0 / max_rpm
 
             # Rate limiting: wait before making request if needed
@@ -184,16 +185,19 @@ def retry_with_rate_limit(
                     result = func(self, *args, **kwargs)
                     previous_call_ts = time.time()
                     return result
-                except cohere.errors.TooManyRequestsError as e:
-                    if attempt == max_retries - 1:
-                        raise
-                    # For rate limits, wait longer (30s minimum to respect API limits)
-                    delay = max(30, initial_delay * (2**attempt))
-                    logger.warning(
-                        f"Cohere rate limit (attempt {attempt + 1}/{max_retries}): {e}. Retrying in {delay}s..."
-                    )
-                    time.sleep(delay)
                 except Exception as e:
+                    if (
+                        cohere is not None
+                        and isinstance(e, cohere.errors.TooManyRequestsError)  # type: ignore[attr-defined]
+                    ):
+                        if attempt == max_retries - 1:
+                            raise
+                        delay = max(30, initial_delay * (2**attempt))
+                        logger.warning(
+                            f"Cohere rate limit (attempt {attempt + 1}/{max_retries}): {e}. Retrying in {delay}s..."
+                        )
+                        time.sleep(delay)
+                        continue
                     if attempt == max_retries - 1:
                         raise
                     delay = initial_delay * (2**attempt)

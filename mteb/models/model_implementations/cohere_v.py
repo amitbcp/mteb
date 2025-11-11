@@ -1,7 +1,9 @@
 import base64
 import io
 import os
+import sys
 import time
+from pathlib import Path
 from typing import Any, Literal, get_args
 
 import torch
@@ -169,11 +171,16 @@ EmbeddingType = Literal[
 ]
 
 
-def cohere_v_loader(model_name, **kwargs):
-    requires_package(
-        cohere_v_loader, "cohere", model_name, "pip install 'mteb[cohere]'"
-    )
-    import cohere
+def cohere_v_loader(hf_model_name: str, revision: str | None = None, **kwargs):
+    cohere_model_name = kwargs.pop("model_name", None) or hf_model_name.split("/")[-1]
+    backend = os.environ.get("COHERE_BACKEND", "").lower()
+    if backend != "oci":
+        requires_package(
+            cohere_v_loader, "cohere", cohere_model_name, "pip install 'mteb[cohere]'"
+        )
+        import cohere  # type: ignore
+    else:
+        cohere = None  # type: ignore
 
     class CohereMultiModalModelWrapper(AbsEncoder):
         def __init__(
@@ -189,18 +196,49 @@ def cohere_v_loader(model_name, **kwargs):
             Cohere currently supports 40 images/min, thus time.sleep(1.5) is applied after each image.
             Remove or adjust this after Cohere API changes capacity.
             """
+            self._use_oci_backend = os.environ.get("COHERE_BACKEND", "").lower() == "oci"
             requires_image_dependencies()
             from torchvision import transforms
 
             self.model_name = model_name
+            self.to_pil_image = transforms.ToPILImage()
             if embedding_type not in get_args(EmbeddingType):
                 raise ValueError(
                     f"Embedding type {embedding_type} not allowed. Choose from {get_args(EmbeddingType)}"
                 )
             self.embedding_type = embedding_type
             self.output_dimension = output_dimension
-            api_key = os.getenv("COHERE_API_KEY")
-            self.client = cohere.ClientV2(api_key)
+            if self._use_oci_backend:
+                if self.embedding_type != "float":
+                    raise ValueError(
+                        "OCI backend currently supports only float embeddings."
+                    )
+                try:
+                    from notebooks.oci.mteb_cohere_oci import OciCohereClient
+                except ImportError:
+                    repo_root = None
+                    current = Path(__file__).resolve()
+                    for ancestor in current.parents:
+                        candidate = ancestor / "notebooks" / "oci" / "mteb_cohere_oci.py"
+                        if candidate.exists():
+                            repo_root = candidate.parent
+                            break
+                    if repo_root is None:
+                        raise ImportError(
+                            "COHERE_BACKEND=oci requires notebooks/oci/mteb_cohere_oci.py to be available."
+                        )
+                    if str(repo_root) not in sys.path:
+                        sys.path.insert(0, str(repo_root))
+                    try:
+                        from mteb_cohere_oci import OciCohereClient  # type: ignore
+                    except ImportError as exc:
+                        raise ImportError(
+                            "COHERE_BACKEND=oci requires notebooks/oci/mteb_cohere_oci.py to be importable."
+                        ) from exc
+                self.client = OciCohereClient(model_name)
+            else:
+                api_key = os.getenv("COHERE_API_KEY")
+                self.client = cohere.ClientV2(api_key)  # type: ignore[union-attr]
             self.image_format = "JPEG"
             self.transform = transforms.Compose([transforms.PILToTensor()])
 
@@ -295,16 +333,28 @@ def cohere_v_loader(model_name, **kwargs):
             **kwargs: Any,
         ):
             all_image_embeddings = []
-            images = [image for batch in images for image in batch["images"]]
-
             for batch in tqdm(
-                images, disable=not show_progress_bar, desc="Image Encoding"
+                images,
+                disable=not show_progress_bar,
+                desc="Image Encoding",
             ):
-                for image in batch:
-                    # cohere only supports 1 image per call
+                image_list = None
+                if isinstance(batch, dict):
+                    if "image" in batch:
+                        image_list = batch["image"]
+                    elif "images" in batch:
+                        image_list = batch["images"]
+                if image_list is None:
+                    raise KeyError("Expected 'image' or 'images' key in batch.")
+
+                for image in image_list:
                     buffered = io.BytesIO()
-                    image = self.transform(image)
-                    image.save(buffered, format=self.image_format)
+                    if isinstance(image, torch.Tensor):
+                        pil_image = self.to_pil_image(image)
+                    else:
+                        pil_image = image
+                    pil_image = pil_image.convert("RGB")
+                    pil_image.save(buffered, format=self.image_format)
                     image_bytes = buffered.getvalue()
                     stringified_buffer = base64.b64encode(image_bytes).decode("utf-8")
                     content_type = f"image/{self.image_format.lower()}"
@@ -318,22 +368,22 @@ def cohere_v_loader(model_name, **kwargs):
                     if self.output_dimension is not None:
                         embed_kwargs["output_dimension"] = self.output_dimension
 
-                        response = self._embed_func(**embed_kwargs)
+                    response = self._embed_func(**embed_kwargs)
 
-                        # Get embeddings based on requested type
-                        if self.embedding_type == "float":
-                            embeddings = response.embeddings.float
-                        elif self.embedding_type == "int8":
-                            embeddings = response.embeddings.int8
-                        elif self.embedding_type == "uint8":
-                            embeddings = response.embeddings.uint8
-                        elif self.embedding_type == "binary":
-                            embeddings = response.embeddings.binary
-                        else:
-                            raise ValueError(
-                                f"Embedding type {self.embedding_type} not allowed"
-                            )
-                        all_image_embeddings.append(torch.tensor(embeddings))
+                    if self.embedding_type == "float":
+                        embeddings = response.embeddings.float
+                    elif self.embedding_type == "int8":
+                        embeddings = response.embeddings.int8
+                    elif self.embedding_type == "uint8":
+                        embeddings = response.embeddings.uint8
+                    elif self.embedding_type == "binary":
+                        embeddings = response.embeddings.binary
+                    else:
+                        raise ValueError(
+                            f"Embedding type {self.embedding_type} not allowed"
+                        )
+                    all_image_embeddings.append(torch.tensor(embeddings))
+                    if not self._use_oci_backend:
                         time.sleep(1.5)
             all_image_embeddings = torch.cat(all_image_embeddings, dim=0)
 
@@ -374,7 +424,7 @@ def cohere_v_loader(model_name, **kwargs):
                 return image_embeddings
             raise ValueError
 
-    return CohereMultiModalModelWrapper(model_name, **kwargs)
+    return CohereMultiModalModelWrapper(cohere_model_name, **kwargs)
 
 
 cohere_mult_3 = ModelMeta(
