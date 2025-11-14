@@ -56,6 +56,46 @@ class _VidoreTextBase(AbsTaskRetrieval):
         self.data_loaded = True
 
 
+class VidoreTabfquadTextRetrieval(_VidoreTextBase):
+    corpus_subdir = "vidore_tabfquad_test_subsampled_beir_fusion_text"
+    metadata = TaskMetadata(
+        name="VidoreTabfquadTextRetrieval",
+        description=(
+            "ViDoRe TabFQuAD retrieval using OCR-converted documents (no numeric transformation). "
+            "Queries and relevance labels follow the original dataset."
+        ),
+        reference="https://arxiv.org/pdf/2407.01449",
+        dataset={
+            "path": "vidore/tabfquad_test_subsampled_beir",
+            "revision": "61a2224bcd29b7b261a4892ff4c8bea353527a31",
+        },
+        type="Retrieval",
+        category="t2t",
+        eval_splits=["test"],
+        eval_langs=["eng-Latn"],
+        main_score="ndcg_at_5",
+        date=("2024-01-01", "2024-07-01"),
+        domains=["Academic"],
+        task_subtypes=["Question answering"],
+        license="mit",
+        annotations_creators="derived",
+        dialect=[],
+        modalities=["text"],
+        sample_creation="found",
+        bibtex_citation=r"""
+@article{faysse2024colpali,
+  author = {Faysse, Manuel and Sibille, Hugues and Wu, Tony and Viaud, Gautier and Hudelot, C{\'e}line and Colombo, Pierre},
+  journal = {arXiv preprint arXiv:2407.01449},
+  title = {ColPali: Efficient Document Retrieval with Vision Language Models},
+  year = {2024},
+}
+""",
+        prompt={
+            "query": "Given a question, retrieve the most relevant OCR text snippet from the table document."
+        },
+    )
+
+
 class VidoreTabfquadTextNoNumbersRetrieval(_VidoreTextBase):
     corpus_subdir = "vidore_tabfquad_test_subsampled_beir_fusion_text_no_numbers"
     metadata = TaskMetadata(
@@ -132,6 +172,46 @@ class VidoreTabfquadTextNumTokenRetrieval(_VidoreTextBase):
 """,
         prompt={
             "query": "Given a question, retrieve the OCR text snippet where numeric values are replaced with NUM."
+        },
+    )
+
+
+class VidoreTatdqaTextRetrieval(_VidoreTextBase):
+    corpus_subdir = "vidore_tatdqa_test_beir_fusion_text"
+    metadata = TaskMetadata(
+        name="VidoreTatdqaTextRetrieval",
+        description=(
+            "ViDoRe TatDQA retrieval using OCR-converted documents (no numeric transformation). "
+            "Queries and relevance labels follow the original dataset."
+        ),
+        reference="https://arxiv.org/pdf/2407.01449",
+        dataset={
+            "path": "vidore/tatdqa_test_beir",
+            "revision": "5feb5630fdff4d8d189ffedb2dba56862fdd45c0",
+        },
+        type="Retrieval",
+        category="t2t",
+        eval_splits=["test"],
+        eval_langs=["eng-Latn"],
+        main_score="ndcg_at_5",
+        date=("2024-01-01", "2024-07-01"),
+        domains=["Academic"],
+        task_subtypes=["Question answering"],
+        license="mit",
+        annotations_creators="derived",
+        dialect=[],
+        modalities=["text"],
+        sample_creation="found",
+        bibtex_citation=r"""
+@article{faysse2024colpali,
+  author = {Faysse, Manuel and Sibille, Hugues and Wu, Tony and Viaud, Gautier and Hudelot, C{\'e}line and Colombo, Pierre},
+  journal = {arXiv preprint arXiv:2407.01449},
+  title = {ColPali: Efficient Document Retrieval with Vision Language Models},
+  year = {2024},
+}
+""",
+        prompt={
+            "query": "Given a table-focused question, retrieve the OCR text snippet from the original document."
         },
     )
 

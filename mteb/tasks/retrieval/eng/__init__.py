@@ -205,8 +205,10 @@ from .vidore_bench_retrieval import (
     VidoreTatdqaRetrieval,
 )
 from .vidore_tabular_text_retrieval import (
+    VidoreTabfquadTextRetrieval,
     VidoreTabfquadTextNoNumbersRetrieval,
     VidoreTabfquadTextNumTokenRetrieval,
+    VidoreTatdqaTextRetrieval,
     VidoreTatdqaTextNoNumbersRetrieval,
     VidoreTatdqaTextNumTokenRetrieval,
 )
@@ -420,7 +422,9 @@ __all__ = [
     "VidoreSyntheticDocQAGovernmentReportsRetrieval",
     "VidoreSyntheticDocQAHealthcareIndustryRetrieval",
     "VidoreTabfquadRetrieval",
+    "VidoreTabfquadTextRetrieval",
     "VidoreTatdqaRetrieval",
+    "VidoreTatdqaTextRetrieval",
     "VidoreTabfquadTextNoNumbersRetrieval",
     "VidoreTabfquadTextNumTokenRetrieval",
     "VidoreTatdqaTextNoNumbersRetrieval",
